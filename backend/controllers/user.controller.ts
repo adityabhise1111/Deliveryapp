@@ -1,0 +1,38 @@
+import { validationResult } from "express-validator";
+import { Request, Response ,NextFunction} from "express";
+import { createUser } from "../services/user.service";
+import bcrypt from "bcrypt";
+
+export async function registerUser (req:Request , res:Response, next :NextFunction): Promise<void> {
+    const errors = validationResult(req);
+    if(!errors.isEmpty()) {
+        res.status(400).json({errors: errors.array()});
+        return;
+    }
+
+    const {firstName, lastName, email, password} = {
+        ...req.body.fullName,
+        email: req.body.email,
+        password: req.body.password
+    };
+    try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        
+        const user = await createUser(firstName, lastName, email, hashedPassword);
+        const token = user.generateAuthToken();
+
+        res.status(201).json({ token, user });
+    } catch (error:any) {
+        console.error("Registration error:", error);
+        
+        if (error.code === 11000) {
+            res.status(400).json({ message: "Email already exists" });
+            return;
+        }
+        
+        res.status(500).json({ message: error.message || "Internal server error" });
+    
+    }
+
+
+}

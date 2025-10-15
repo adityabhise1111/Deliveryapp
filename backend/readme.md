@@ -126,19 +126,100 @@ Creates a new user account with hashed password and returns a JWT authentication
 
 ---
 
+### 2. Login User
+
+**Endpoint:** `POST /users/login`
+
+**Description:**  
+Authenticates an existing user with email and password, returns a JWT authentication token.
+
+**Request Body:**
+```json
+{
+  "email": "string (valid email format, required)",
+  "password": "string (min 6 characters, required)"
+}
+```
+
+**Example Request:**
+```json
+{
+  "email": "john.doe@example.com",
+  "password": "password123"
+}
+```
+
+**Validation Rules:**
+- `email`: Must be valid email format, required
+- `password`: Minimum 6 characters, required
+
+**Success Response:**
+
+**Status Code:** `200 OK`
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "fullName": {
+      "firstName": "John",
+      "lastName": "Doe"
+    },
+    "email": "john.doe@example.com",
+    "_id": "68efc6ac570db6d9097aff84",
+    "createdAt": "2024-10-15T10:30:00.000Z",
+    "updatedAt": "2024-10-15T10:30:00.000Z"
+  }
+}
+```
+
+**Error Responses:**
+
+**Status Code:** `400 Bad Request` - Validation Error
+```json
+{
+  "errors": [
+    {
+      "type": "field",
+      "msg": "Invalid email format",
+      "path": "email",
+      "location": "body"
+    }
+  ]
+}
+```
+
+**Status Code:** `401 Unauthorized` - Invalid Credentials
+```json
+{
+  "message": "Invalid email or password"
+}
+```
+
+**Status Code:** `500 Internal Server Error`
+```json
+{
+  "message": "Internal server error"
+}
+```
+
+---
+
 ## Status Codes Summary
 
 | Status Code | Description |
 |-------------|-------------|
+| `200` | Login successful |
 | `201` | User successfully created |
 | `400` | Validation error or duplicate email |
+| `401` | Invalid email or password |
 | `500` | Server error |
 
 ---
 
 ## Authentication
 
-The `/users/register` endpoint returns a JWT token that should be used for authenticated requests.
+Both `/users/register` and `/users/login` endpoints return a JWT token that should be used for authenticated requests.
 
 **Token Usage:**
 ```
@@ -196,4 +277,34 @@ backend/
 ├── .env
 ├── tsconfig.json
 └── package.json
+```
+
+---
+
+## Testing with Postman
+
+### Register User
+```
+POST http://localhost:4000/users/register
+Content-Type: application/json
+
+{
+  "fullName": {
+    "firstName": "John",
+    "lastName": "Doe"
+  },
+  "email": "john.doe@example.com",
+  "password": "password123"
+}
+```
+
+### Login User
+```
+POST http://localhost:4000/users/login
+Content-Type: application/json
+
+{
+  "email": "john.doe@example.com",
+  "password": "password123"
+}
 ```

@@ -63,6 +63,7 @@ export async function loginUser (req:Request , res:Response, next :NextFunction)
             return;
         }
         const token = user.generateAuthToken();
+        res.cookie("token", token);
         res.status(200).json({token, user});
         return;
 

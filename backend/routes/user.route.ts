@@ -1,6 +1,8 @@
 import express ,{ Request, Response } from "express";
 import { body } from "express-validator";
 import { registerUser, loginUser } from "../controllers/user.controller";
+import { authUser } from "../middlewares/auth.middleware";
+
 const router = express.Router();
 
 
@@ -21,6 +23,11 @@ loginUser //if validation passes, call loginUser controller
 
 router.get('/' , (req:Request,res:Response)=> {
     res.send("hellow from user routes");
+})
+
+router.get('/profile' ,authUser, (req:Request,res:Response)=> {
+    res.status(200).json(req.user);
+
 })
 
 

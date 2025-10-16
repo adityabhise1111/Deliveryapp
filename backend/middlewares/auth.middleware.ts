@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import jwt, { JwtHeader } from "jsonwebtoken";
 import dotenv from "dotenv";
 import userModel from "../model/user.model";
+import blacklistTokenModel from "../model/blacklistToken.model";
 dotenv.config();
 
 declare global {
@@ -18,6 +19,11 @@ export async function authUser(req: Request, res: Response, next: NextFunction):
     const token = req.cookies.token || req.header("Authorization")?.split(" ")[1];
     if (!token) {
         res.status(401).json({ message: "Access denied. No token provided." });
+        return;
+    }
+    const isBlacklisted = await blacklistTokenModel.findOne({ token });
+    if (isBlacklisted) {
+        res.status(401).json({ message: "Token has been revoked." });
         return;
     }
     try {
@@ -44,3 +50,4 @@ export async function authUser(req: Request, res: Response, next: NextFunction):
 
     }
 }
+

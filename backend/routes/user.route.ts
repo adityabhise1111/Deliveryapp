@@ -1,10 +1,8 @@
 import express ,{ Request, Response } from "express";
 import { body } from "express-validator";
-import { registerUser, loginUser } from "../controllers/user.controller";
+import { registerUser, loginUser, getUserProfile, logoutUser } from "../controllers/user.controller";
 import { authUser } from "../middlewares/auth.middleware";
-
 const router = express.Router();
-
 
 router.post("/register",[
     body("email").isEmail().withMessage("Invalid email format"),
@@ -25,10 +23,8 @@ router.get('/' , (req:Request,res:Response)=> {
     res.send("hellow from user routes");
 })
 
-router.get('/profile' ,authUser, (req:Request,res:Response)=> {
-    res.status(200).json(req.user);
+router.get('/profile' ,authUser, getUserProfile ) // Protected route, only accessible if authUser middleware passes
 
-})
-
+router.get('/logout' ,authUser, logoutUser )
 
 export default router;

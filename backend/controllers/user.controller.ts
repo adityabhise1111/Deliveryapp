@@ -3,6 +3,7 @@ import { Request, Response ,NextFunction} from "express";
 import { createUser } from "../services/user.service";
 import bcrypt from "bcrypt";
 import userModel from "../model/user.model";
+import blacklistTokenModel from "../model/blacklistToken.model";
 
 export async function registerUser (req:Request , res:Response, next :NextFunction): Promise<void> {
     const errors = validationResult(req);
@@ -78,3 +79,21 @@ export async function loginUser (req:Request , res:Response, next :NextFunction)
 
 }
 
+export async function getUserProfile(req :Request , res:Response, next :NextFunction): Promise<void> {
+    res.status(200).json({user: req.user});
+    return;
+}
+
+export async function logoutUser(req: Request, res: Response): Promise<void> {
+    const token = req.cookies.token || req.header("Authorization")?.split(" ")[1];
+    if (!token) {
+        res.status(400).json({ message: "No token provided." });
+        return;
+    }else{
+        await blacklistTokenModel.create({ token });
+    }
+
+    res.clearCookie("token");
+    res.status(200).json({ message: "Logged out successfully" });
+    return;
+}

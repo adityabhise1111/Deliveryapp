@@ -15,22 +15,30 @@ interface User {
 interface UserContextType {
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  
 }
 
 interface UserContextProviderProps {
   children: ReactNode;
 }
 
-export const UserContext = createContext<UserContextType | undefined>(undefined);
+export const UserDataContext = createContext<UserContextType | undefined>(undefined);
 
-export const UserContextProvider: React.FC<UserContextProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+export const UserContext: React.FC<UserContextProviderProps> = ({ children }) => {
+  const [user, setUser] = useState<User | null>({
+    email:" ",
+    fullName:{
+      firstName: " ",
+      lastName: " "
+    },
+
+  });
 
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserDataContext.Provider value={{ user, setUser }}>
       {children}
-    </UserContext.Provider>
+    </UserDataContext.Provider>
   )
 }
 
-export default UserContextProvider
+export default UserContext

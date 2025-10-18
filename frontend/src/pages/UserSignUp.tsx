@@ -91,6 +91,7 @@ const UserSignUp: React.FC = () => {
             placeholder='Enter your password'
             type="password"
           />
+          
           <button
             type="submit"
             className='bg-black text-white w-full py-3 rounded mt-2 text-xl'

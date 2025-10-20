@@ -1,16 +1,26 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import image from '../assets/image.png'
+import uber from '../assets/uber.png'
 
-const Home: React.FC = () => {
+const Home = () => {
   return (
-    <div>
-        <div className="bg-cover bg-[url(https://images.unsplash.com/photo-1557404763-69708cd8b9ce?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8dHJhZmZpYyUyMGxpZ2h0fGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=600)] pt-8 flex flex-col justify-between  h-screen w-full bg-red-400">
-            <img className='w-16 ml-8' src="https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png" alt="" />
-            <div className='bg-white py-5 px-5 pb-7'>
-                <h2 className='text-3xl font-bold'>Get Started with us</h2>
-                <Link to={"/login"} className='flex justify-center bg-black text-white w-full py-3 rounded mt-2'>Continue</Link>
-            </div>
+    <div className='h-screen relative'>
+      <img className='top-5 left-5 w-16 absolute' src={uber} alt="uber-logo" />
+      <div className="h-screen w-screen" >
+        <img className="h-full w-full object-cover " src={image} alt="map" />
+      </div>
+      <div className="flex flex-col justify-end h-screen absolute top-0 w-full">
+        <div className='bg-white h-[30%] p-5'>
+          <h4 className='text-3xl semi-bold'>Find a trip</h4>
+          <form >
+              <input className='bg-[#eee] px-8 py-2 text-base rounded-lg my-1 w-full ' type="text" name="" placeholder='Add a pickup location' id="" />
+              <input className='bg-[#eee] px-12 py-2 text-base rounded-lg my-1 w-full' type="text" name="" placeholder='Enter Your Destination' id="" />
+          </form>
         </div>
+        <div className='h-[70%] bg-amber-800 p-5 hidden'>
+
+        </div>
+      </div>
     </div>
   )
 }

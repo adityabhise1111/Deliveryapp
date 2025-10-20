@@ -2,6 +2,7 @@ import express ,{ Request, Response } from "express";
 import { body } from "express-validator";
 import { registerCaptain, loginCaptain, getCaptainProfile, logoutCaptain } from "../controllers/captain.controller";
 import { authUser, authCaptain } from "../middlewares/auth.middleware";
+import e from "express";
 const router = express.Router();
 
 router.post("/register",[

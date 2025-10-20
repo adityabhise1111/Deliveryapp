@@ -1,7 +1,7 @@
 import React, { createContext, useState } from 'react'
 import type { ReactNode } from 'react'
 
-interface User {
+export interface User {
   fullName?: {
     firstName: string;
     lastName: string;
@@ -12,7 +12,7 @@ interface User {
   updatedAt?: string;
 }
 
-interface UserContextType {
+export interface UserContextType {
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
   
@@ -24,7 +24,7 @@ interface UserContextProviderProps {
 
 export const UserDataContext = createContext<UserContextType | undefined>(undefined);
 
-export const UserContext: React.FC<UserContextProviderProps> = ({ children }) => {
+export const UserContextProvider: React.FC<UserContextProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>({
     email:" ",
     fullName:{
@@ -41,4 +41,4 @@ export const UserContext: React.FC<UserContextProviderProps> = ({ children }) =>
   )
 }
 
-export default UserContext
+export default UserContextProvider

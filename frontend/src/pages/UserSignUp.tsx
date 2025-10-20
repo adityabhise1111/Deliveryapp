@@ -1,5 +1,8 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import axios, { type AxiosResponse } from 'axios';
+import React, { useContext, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { UserDataContext } from '../context/UserContext';
+
 
 interface UserData {
   fullName: {
@@ -10,28 +13,51 @@ interface UserData {
   password: string;
 }
 
+
 const UserSignUp: React.FC = () => {
+  const navigate = useNavigate()
+  const context = useContext(UserDataContext);
+
+  if (!context) {
+    throw new Error('UserSignUp must be used within UserContextProvider');
+  }
+
+  const { user, setUser } = context;
+
+
   const [firstname, setFirstname] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [userData, setUserData] = useState<UserData | {}>({});
 
-  const submitHandler = (e: React.FormEvent<HTMLFormElement>): void => {
+  const submitHandler = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
-    
+    if (password.length < 6) {
+      alert("Password must be at least 6 characters long");
+      return;
+    }
     const newUserData: UserData = {
-      fullName:{
+      fullName: {
         firstName: firstname,
         lastName
       },
-      email, 
-      password, 
+      email,
+      password,
     };
-    
+
+    const response :AxiosResponse  = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/register`, newUserData);
+    if (response.status === 201) {
+      const data = response.data;
+
+      setUser(data.user);
+
+
+      navigate('/home');
+    }
     setUserData(newUserData);
     console.log(newUserData);
-    
+
     setEmail("");
     setPassword("");
     setFirstname("");
@@ -91,7 +117,7 @@ const UserSignUp: React.FC = () => {
             placeholder='Enter your password'
             type="password"
           />
-          
+
           <button
             type="submit"
             className='bg-black text-white w-full py-3 rounded mt-2 text-xl'

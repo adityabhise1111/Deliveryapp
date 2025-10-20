@@ -1,8 +1,14 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { CaptainDataContext } from '../context/CaptainContext';
+import { useNavigate } from 'react-router-dom';
+import axios ,{ type AxiosResponse }from 'axios';
+
+
+
+
 
 type VehicleType = 'car' | 'bike' | 'motorcycle' | 'truck';
-
 interface CaptainData {
   fullName: {
     firstName: string;
@@ -18,7 +24,19 @@ interface CaptainData {
   };
 }
 
+
+
+
+
 const CaptainSignUp: React.FC = () => {
+  const navigate = useNavigate();
+  const context = useContext(CaptainDataContext);
+  if (!context) {
+    throw new Error('UserSignUp must be used within UserContextProvider');
+  }
+  const { captain, setCaptain } = context;
+  console.log("[CaptainSignUp] Rendering CaptainSignUp component");
+
   const [firstname, setFirstname] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
@@ -31,9 +49,12 @@ const CaptainSignUp: React.FC = () => {
   
   const [captainData, setCaptainData] = useState<CaptainData | {}>({});
 
-  const submitHandler = (e: React.FormEvent<HTMLFormElement>): void => {
+  const submitHandler = async(e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
-    
+    if (password.length < 6) {
+      alert("Password must be at least 6 characters long");
+      return;
+    }
     const newCaptainData: CaptainData = {
       fullName:{
         firstName: firstname,
@@ -48,6 +69,18 @@ const CaptainSignUp: React.FC = () => {
         vehicleType: vehicleType as VehicleType
       }
     };
+
+    console.log("New Captain Data:", newCaptainData);
+
+    const response : AxiosResponse = await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/register`, newCaptainData);
+
+    if (response.status === 201) {
+      const data = response.data;
+      setCaptain(data.captain);
+      localStorage.setItem('token', data.token);
+
+      navigate('/home');
+    }
     
     setCaptainData(newCaptainData);
     console.log(newCaptainData);

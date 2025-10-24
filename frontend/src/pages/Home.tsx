@@ -115,7 +115,9 @@ const Home: React.FC = () => {
           <LocationSearchPanel setPanel={setPanel} setVehiclePanel={setVehiclePanel}/>
         </div>
 
-        <div ref={vehiclePanelRef} className="Vehicle bg-white fixed w-full z-10 bottom-0 translate-y-full px-3 py-8 rounded-2xl">
+        
+      </div>
+      <div ref={vehiclePanelRef} className="Vehicle bg-white fixed w-full z-10 bottom-0 translate-y-full px-3 py-8 rounded-2xl">
           <VehiclePanel setConfirmRidePanel={setConfirmRidePanel} setVehiclePanel={setVehiclePanel} setSelectedVehicle={setSelectedVehicle} selectedVehicle={selectedVehicle} />
         </div>
 
@@ -123,10 +125,9 @@ const Home: React.FC = () => {
           <ConfirmRide confirmRidePanel={confirmRidePanel} setConfirmRidePanel={setConfirmRidePanel} setLookingForRidePanel={setLookingForRidePanel} />
         </div>
 
-        <div ref={vehicleFoundRef} className="lookingForRide hidden">
+        <div ref={vehicleFoundRef} className="lookingForRide bg-white fixed w-full z-10 bottom-0 translate-y-full px-3 py-8 rounded-2xl">
           <LookingForDriver lookingForRidePanel={lookingForRidePanel} setLookingForRidePanel={setLookingForRidePanel}  />
         </div>
-      </div>
     </div>
   )
 }

@@ -7,7 +7,7 @@ interface LookingForDriverProps {
   setLookingForRidePanel: Dispatch<SetStateAction<boolean>>;
 }
 
-const LookingForDriver:React.FC<LookingForDriverProps>  = (props) => {
+const LookingForDriver:React.FC<LookingForDriverProps> =() => {
   return (
     <div className='bg-white'>
       <h3 className='text-2xl font-semibold mb-4  '> Looking for Vehicle</h3>

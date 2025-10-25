@@ -8,7 +8,7 @@ const Start: React.FC = () => {
             <img className='w-16 ml-8' src="https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png" alt="" />
             <div className='bg-white py-5 px-5 pb-7'>
                 <h2 className='text-3xl font-bold'>Get Started with us</h2>
-                <Link to={"/login"} className='flex justify-center bg-black text-white w-full py-3 rounded mt-2'>Continue</Link>
+                <Link to={"/home"} className='flex justify-center bg-black text-white w-full py-3 rounded mt-2'>Continue</Link>
             </div>
         </div>
     </div>

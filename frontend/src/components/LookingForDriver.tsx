@@ -5,9 +5,10 @@ import car from '../assets/car.png'
 interface LookingForDriverProps {
   lookingForRidePanel: boolean;
   setLookingForRidePanel: Dispatch<SetStateAction<boolean>>;
+  setWaitingForDriverPanel: Dispatch<SetStateAction<boolean>>;
 }
 
-const LookingForDriver:React.FC<LookingForDriverProps> =() => {
+const LookingForDriver:React.FC<LookingForDriverProps> =(props) => {
   return (
     <div className='bg-white'>
       <h3 className='text-2xl font-semibold mb-4  '> Looking for Vehicle</h3>
@@ -31,9 +32,12 @@ const LookingForDriver:React.FC<LookingForDriverProps> =() => {
           </div>
           <div className='flex items-center gap-5 p-3'>
             <i className="ri-wallet-2-fill"></i>
-            <div>
+            <div onClick={()=>{
+                props.setLookingForRidePanel(false)
+                props.setWaitingForDriverPanel(true)
+              }}> {/* remove this its for testing only */} 
               <h3 className='text-3xl font-medium'>₹178.28</h3>
-              <p className='text-sm mt-1 text-gray-600 '>Cash</p>
+              <p  className='text-sm mt-1 text-gray-600 '>Cash</p>
             </div>
           </div>
         </div>

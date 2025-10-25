@@ -8,6 +8,7 @@ import LocationSearchPanel from '../components/LocationSearchPanel'
 import VehiclePanel from '../components/VehiclePanel'
 import ConfirmRide from '../components/ConfirmRide'
 import LookingForDriver from '../components/LookingForDriver'
+import WaitingForDriver from '../components/WaitingForDriver'
 
 const Home: React.FC = () => {
   const [pickup, setPickup] = useState <string> ('');
@@ -17,12 +18,14 @@ const Home: React.FC = () => {
   const [vehiclePanel, setVehiclePanel] = useState<boolean>(false)
   const [confirmRidePanel, setConfirmRidePanel] = useState<boolean>(false);
   const [lookingForRidePanel, setLookingForRidePanel] = useState<boolean>(false);
+  const [waitingForDriverPanel, setWaitingForDriverPanel] = useState<boolean>(false);
 
   const panelRef = useRef<HTMLDivElement>(null);
   const vehiclePanelRef = useRef<HTMLDivElement>(null);
   const panelCloseRef = useRef<HTMLHeadingElement>(null);
   const confirmRidePanelRef = useRef<HTMLDivElement>(null);
   const vehicleFoundRef = useRef(null)
+  const waitingForDriverRef = useRef(null)
 
   const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -79,6 +82,20 @@ const Home: React.FC = () => {
     }
   }, [lookingForRidePanel])
 
+  useGSAP(function(){
+    if(waitingForDriverPanel){
+      gsap.to(waitingForDriverRef.current,{
+        transform: 'translateY(0)',
+        display: 'block'
+      })
+    }else{
+      gsap.to(waitingForDriverRef.current,{
+        transform: 'translateY(100%)',
+        display: 'hidden'
+      })
+    }
+  }, [waitingForDriverPanel])
+
   return (
     <div className='h-screen relative overflow-hidden'>
       <img className='top-5 left-5 w-16 absolute' src={uber} alt="uber-logo" />
@@ -126,7 +143,11 @@ const Home: React.FC = () => {
         </div>
 
         <div ref={vehicleFoundRef} className="lookingForRide bg-white fixed w-full z-10 bottom-0 translate-y-full px-3 py-8 rounded-2xl">
-          <LookingForDriver lookingForRidePanel={lookingForRidePanel} setLookingForRidePanel={setLookingForRidePanel}  />
+          <LookingForDriver lookingForRidePanel={lookingForRidePanel} setLookingForRidePanel={setLookingForRidePanel} setWaitingForDriverPanel={setWaitingForDriverPanel} />
+        </div>
+
+        <div ref={waitingForDriverRef} className="lookingForRide bg-white fixed w-full z-10 bottom-0 px-3 py-8 rounded-2xl">
+          <WaitingForDriver setWaitingForDriverPanel={setWaitingForDriverPanel}  />
         </div>
     </div>
   )

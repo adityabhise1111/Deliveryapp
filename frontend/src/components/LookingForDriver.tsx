@@ -1,4 +1,3 @@
-import React from 'react'
 import { type Dispatch, type SetStateAction } from 'react';
 import car from '../assets/car.png'
 

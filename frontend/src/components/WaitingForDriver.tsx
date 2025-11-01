@@ -3,25 +3,25 @@ import car from '../assets/car.png'
 interface WaitingForDriverProps {
     setWaitingForDriverPanel: React.Dispatch<React.SetStateAction<boolean>>;
 }
-const WaitingForDriver:React.FC<WaitingForDriverProps> = (props) => {
+const WaitingForDriver: React.FC<WaitingForDriverProps> = (props) => {
 
     return (
         <div className='bg-white'>
             <h5
-        onClick={() => {
-          props.setWaitingForDriverPanel(false);
-        }}
-        className=" text-center  justify-centre items-center p-1">
-        <i className="text-gray-200 text-3xl ri-arrow-down-wide-line "></i></h5>
+                onClick={() => {
+                    props.setWaitingForDriverPanel(false);
+                }}
+                className=" text-center  justify-centre items-center p-1">
+                <i className="text-gray-200 text-3xl ri-arrow-down-wide-line "></i></h5>
 
-        <div className='flex items-center justify-between    '>
-            <img src={car} alt="" className="vehicle h-12" />
-            <div className='text-right'>
-                <h2 className='text-lg font-medium'>Aditya</h2>
-                <h3 className='text-xl font-semibold -mt-2 -mb-1' >MH14 AB 1234</h3>
-                <p className='text-sm text-gray-600'>Mercedes Benz GLC</p>
+            <div className='flex items-center justify-between    '>
+                <img src={car} alt="" className="vehicle h-12" />
+                <div className='text-right'>
+                    <h2 className='text-lg font-medium'>Aditya</h2>
+                    <h3 className='text-xl font-semibold -mt-2 -mb-1' >MH14 AB 1234</h3>
+                    <p className='text-sm text-gray-600'>Mercedes Benz GLC</p>
+                </div>
             </div>
-        </div>
             <div className="confirmvehicle flex flex-col justify-between items-center ">
                 <div className="details my-4 w-full mt-5">
                     <div className='flex items-center gap-5 p-3 border-b-2 border-gray-200'>

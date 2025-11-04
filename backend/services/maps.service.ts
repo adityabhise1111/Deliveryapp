@@ -151,7 +151,7 @@ export async function getDistanceAndTime(
     const route = data.features[0].properties;
 
     return {
-      distance: route.distance, // meters
+      distance: route.distance, // km
       duration: route.time,     // seconds
     };
   } catch (error) {

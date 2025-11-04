@@ -12,6 +12,7 @@ export interface IRide extends mongoose.Document {
     paymentId?: string;
     orderId?: string;
     signature?: string;
+    otp?: string;
 }
 
 
@@ -56,6 +57,11 @@ const RiderSchema = new mongoose.Schema <IRide>({
     },
     signature:{
         type: String,
+    },
+    otp:{
+        type: String,
+        select: false,
+        required: true,
     }
 
 

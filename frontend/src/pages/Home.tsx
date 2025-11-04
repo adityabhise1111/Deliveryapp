@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import image from '../assets/image.png'
 import uber from '../assets/uber.png'
 import { useGSAP } from '@gsap/react'
@@ -9,6 +9,7 @@ import VehiclePanel from '../components/VehiclePanel'
 import ConfirmRide from '../components/ConfirmRide'
 import LookingForDriver from '../components/LookingForDriver'
 import WaitingForDriver from '../components/WaitingForDriver'
+import axios from 'axios'
 
 const Home: React.FC = () => {
   const [pickup, setPickup] = useState<string>('');
@@ -19,6 +20,8 @@ const Home: React.FC = () => {
   const [confirmRidePanel, setConfirmRidePanel] = useState<boolean>(false);
   const [lookingForRidePanel, setLookingForRidePanel] = useState<boolean>(false);
   const [waitingForDriverPanel, setWaitingForDriverPanel] = useState<boolean>(false);
+  const [pickupSuggestions, setPickupSuggestions] = useState<Array<string>>([])
+  const [destinationSuggestions, setDestinationSuggestions] = useState<Array<string>>([])
 
   const panelRef = useRef<HTMLDivElement>(null);
   const vehiclePanelRef = useRef<HTMLDivElement>(null);
@@ -96,6 +99,61 @@ const Home: React.FC = () => {
     }
   }, [waitingForDriverPanel])
 
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      if (pickup.length < 3) {
+        setPickupSuggestions([]);
+        return;
+      }
+      const url = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+      try {
+        const response = await axios.get(`${url}/maps/get-suggestions?input=${encodeURIComponent(pickup)}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            }
+          }
+        );
+         console.log('Pickup suggestions:', response.data);
+        setPickupSuggestions(response.data.suggestions || []);
+
+      } catch (error) {
+        console.error('Error fetching pickup suggestions:', error);
+        setPickupSuggestions([]);
+      }
+    };
+    fetchSuggestions();
+
+  }, [pickup])
+
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      if (destination.length < 3) {
+        setDestinationSuggestions([]);
+        return;
+      }
+      const url = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+      try {
+        const response = await axios.get(`${url}/maps/get-suggestions?input=${encodeURIComponent(destination)}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            }
+          }
+        );
+         console.log('Destination suggestions:', response.data);
+        setDestinationSuggestions(response.data.suggestions || []);
+
+      } catch (error) {
+        console.error('Error fetching destination suggestions:', error);
+        setDestinationSuggestions([]);
+      }
+    };
+    fetchSuggestions();
+
+  }, [destination])
+
+
   return (
     <div className='h-screen relative overflow-hidden'>
       <img className='top-5 left-5 w-16 absolute' src={uber} alt="uber-logo" />
@@ -129,7 +187,18 @@ const Home: React.FC = () => {
         </div>
 
         <div ref={panelRef} className='h-[0%] bg-white '>
-          <LocationSearchPanel setPanel={setPanel} setVehiclePanel={setVehiclePanel} />
+          <LocationSearchPanel 
+          setPanel={setPanel} 
+          setVehiclePanel={setVehiclePanel}
+          pickupSuggestions={pickupSuggestions}
+          destinationSuggestions={destinationSuggestions}
+          setPickupSuggestions={setPickupSuggestions}
+          setDestinationSuggestions={setDestinationSuggestions}
+          pickup={pickup}
+          destination={destination}
+          setPickup={setPickup}
+          setDestination={setDestination}
+          />
         </div>
 
 

@@ -23,7 +23,7 @@ router.get('/get-distance-time',
     authUser,
     getDistanceTime
 );
-router.get('/za',
+router.get('/get-suggestions',
     query('input').isString().isLength({min:1}).withMessage('Input query parameter is required'),
     authUser,
     getAutoCompleteSuggestions

@@ -8,9 +8,12 @@ interface vehiclePanelProps {
     setVehiclePanel: React.Dispatch<React.SetStateAction<boolean>>;
     selectedVehicle?: string | null;
     setConfirmRidePanel: React.Dispatch<React.SetStateAction<boolean>>;
+    fares :object;
 }
 
 const VehiclePanel: React.FC<vehiclePanelProps> = (props) => {
+    const fares = props.fares;
+    console.log("VehiclePanel fares:",fares);
     return (
         <div>
             <h5
@@ -25,16 +28,16 @@ const VehiclePanel: React.FC<vehiclePanelProps> = (props) => {
                 onClick={() => {
                     props.setConfirmRidePanel(true);
                     props.setVehiclePanel(false);
-                    props.setSelectedVehicle('moto')
+                    props.setSelectedVehicle('motorcycle')
                 }}
-                className={`Car my-2 bg-white w-full flex border-2 ${props.selectedVehicle === 'moto' ? 'border-black' : 'border-transparent'} active:border-black items-center p-2 rounded-xl cursor-pointer`}>
+                className={`Car my-2 bg-white w-full flex border-2 ${props.selectedVehicle === 'motorcycle' ? 'border-black' : 'border-transparent'} active:border-black items-center p-2 rounded-xl cursor-pointer`}>
                 <img src={moto} alt="" className="Car w-20" />
                 <div className="name m-5 w-1/2">
                     <h4 className='font-medium text-base'>Uber Moto <span><i className="ri-user-3-fill">4</i></span></h4>
                     <h5 className="distance font-medium text-sm">2 mins away</h5>
                     <p className="para font-normal text-xs">Affordable Compact Rides</p>
                 </div>
-                <h2 className="price text-2xl font-semibold">₹200</h2>
+                <h2 className="price text-2xl font-semibold">₹{fares.motorcycle}</h2>
             </div>
             <div
                 onClick={() => {
@@ -49,7 +52,7 @@ const VehiclePanel: React.FC<vehiclePanelProps> = (props) => {
                     <h5 className="distance font-medium text-sm">2 mins away</h5>
                     <p className="para font-normal text-xs">Affordable Compact Rides</p>
                 </div>
-                <h2 className="price text-2xl font-semibold">₹200</h2>
+                <h2 className="price text-2xl font-semibold">₹{fares.auto}</h2>
             </div>
             <div
                 onClick={() => {
@@ -64,7 +67,7 @@ const VehiclePanel: React.FC<vehiclePanelProps> = (props) => {
                     <h5 className="distance font-medium text-sm">2 mins away</h5>
                     <p className="para font-normal text-xs">Affordable Compact Rides</p>
                 </div>
-                <h2 className="price text-2xl font-semibold">₹200</h2>
+                <h2 className="price text-2xl font-semibold">₹{fares.car}</h2>
             </div>
         </div>
     )

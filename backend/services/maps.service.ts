@@ -1,10 +1,12 @@
-import axios, { isAxiosError } from 'axios';
+import axios from 'axios';
+import captainModel from '../model/captain.model';
 
 const geoapifyApiKey = process.env.GEOAPIFY_API_KEY;
 if (!geoapifyApiKey) {
     throw new Error('GEOAPIFY_API_KEY is not set in environment variables');
 }
 
+import { ICaptain } from '../model/captain.model';
 
 interface OpenCageGeometry {
     lat: number;
@@ -24,66 +26,24 @@ interface NominatimResult {
     lon: string;
     display_name: string;
 }
+interface GeoapifyFeature {
+    properties: {
+        time: number;
+        distance: number;
+        formatted: string;
+        lat: number;
+        lon: number;
+    };
+    geometry?: {
+        type: string;
+        coordinates: [number, number];
+    };
+}
 
-// export async function getAddressCoordinate(address:string):Promise<{lat:number,lng:number}> {
-//     console.log("[maps.service] getAddressCoordinate called");
-//     console.log("Geocoding address:", address);
-//     const apikey = process.env.GOOGLE_MAPS_API_KEY;
-//     if (!apikey) {
-//         throw new Error('GOOGLE_MAPS_API_KEY is not set in environment variables');
-//     }
-//     console.log("[maps.service] API Key exists:", apikey ? 'Yes' : 'No');
-//     console.log("[maps.service] API Key length:", apikey?.length);
+interface GeoapifyResponse {
+    features: GeoapifyFeature[];
+}
 
-//     const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apikey}`;
-//     try {
-//         console.log("[maps.service] Making request to Google Maps API...");
-//         const response = await axios.get(url);
-
-//         console.log("[maps.service] Response status:", response.data.status);
-//         console.log("[maps.service] Full response:", JSON.stringify(response.data, null, 2));
-
-//         if(response.data.status === 'OK'){
-//             const location = response.data.results[0].geometry.location;
-//             return {
-//                 lat: location.lat,
-//                 lng: location.lng
-//             };
-//         } else {
-//             const errorMessage = response.data.error_message || 'No error message provided';
-//             console.error("[maps.service] Google API Error:", {
-//                 status: response.data.status,
-//                 error_message: errorMessage
-//             });
-//             throw new Error(`Geocoding error: ${response.data.status} - ${errorMessage}`);
-//         }
-//     } catch (error) {
-//         console.error("[maps.service] Error in getAddressCoordinate:", error);
-//         if (axios.isAxiosError(error)) {
-//             console.error("[maps.service] Axios error details:", {
-//                 status: error.response?.status,
-//                 data: error.response?.data
-//             });
-//         }
-//         throw error;
-//     }
-// }
-
-// export async function getAddressCoordinates(address: string) {
-//     const apiKey = process.env.OPENCAGE_API_KEY; // <-- Store your key in .env file
-//     const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(address)}&key=${apiKey}`;
-
-//     const response = await axios.get<OpenCageResponse>(url);
-//     const data = response.data;
-
-//     if (!data.results || data.results.length === 0) {
-//         return null;
-//     }
-
-//     // Take first result
-//     const { lat, lng } = data.results[0].geometry;
-//     return { lat, lng };
-// }
 
 
 
@@ -94,7 +54,7 @@ export async function getAddressCoordinates(address: string): Promise<{ lat: num
         // ✅ Proper Geoapify API URL
         const url = `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(address)}&apiKey=${geoapifyApiKey}`;
 
-        const response = await axios.get(url, {
+        const response = await axios.get<GeoapifyResponse>(url, {
             timeout: 10000,
         });
 
@@ -141,7 +101,7 @@ export async function getDistanceAndTime(
     // Geoapify Routing API
     const url = `https://api.geoapify.com/v1/routing?waypoints=${orig.lat},${orig.lon}|${dest.lat},${dest.lon}&mode=drive&apiKey=${geoapifyApiKey}`;
 
-    const { data } = await axios.get(url);
+    const { data } = await axios.get<GeoapifyResponse>(url);
 
     if (!data.features || data.features.length === 0) {
       console.log("[maps.service] No route found between origin and destination");
@@ -166,7 +126,7 @@ export async function getSuggestions(input: string): Promise<string[]> {
     }
     try {
         const url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(input)}&apiKey=${geoapifyApiKey}&limit=5`;
-        const response = await axios.get(url);
+        const response = await axios.get<GeoapifyResponse>(url);
         const data = response.data;
         if (!data || !data.features) {
             console.log('[maps.service] No suggestions found for input:', input);
@@ -177,6 +137,64 @@ export async function getSuggestions(input: string): Promise<string[]> {
 
     } catch (error) {
         console.error('[maps.service] Error in getAutoCompleteSuggestions:', error);
+        throw error;
+    }
+}
+
+// export async function getCaptainsIntheRadius(
+//   lat: number,  // Keep parameter name as lat for clarity
+//   lng: number,
+//   radius: number
+// ): Promise<ICaptain[]> {
+//     console.log(`[maps.service] Finding captains within ${radius} km of (${lat}, ${lng})`);
+    
+//     try {
+//         // Use simple bounding box query since we're using ltd/lng (not proper GeoJSON)
+//         const latDelta = radius / 111; // 1 degree lat ≈ 111 km
+//         const lngDelta = radius / (111 * Math.cos(lat * Math.PI / 180));
+        
+//         const captains = await captainModel.find({
+//             'location.ltd': { 
+//                 $gte: lat - latDelta, 
+//                 $lte: lat + latDelta 
+//             },
+//             'location.lng': { 
+//                 $gte: lng - lngDelta, 
+//                 $lte: lng + lngDelta 
+//             },
+//             status: 'active' // Only find active captains
+//         });
+        
+//         console.log('[maps.service] Query conditions:', {
+//             lat: { min: lat - latDelta, max: lat + latDelta },
+//             lng: { min: lng - lngDelta, max: lng + lngDelta }
+//         });
+//         console.log('[maps.service] Captains found:', captains.length); 
+        
+//         return captains;
+//     } catch (error) {
+//         console.error('[maps.service] Error finding captains:', error);
+//         throw error;
+//     }
+// }
+
+export async function getCaptainsIntheRadius(
+  lat: number,  // Keep parameter name as lat for clarity
+  lng: number,
+  radius: number
+): Promise<ICaptain[]> {
+    console.log(`[maps.service] Finding captains within ${radius} km of (${lat}, ${lng})`);
+    try {
+        const captains = await captainModel.find({
+            location:{
+                $geoWithin: {
+                    $centerSphere: [ [ lat, lng ], radius / 6378.1 ] // radius in radians
+                }
+            }
+        })
+        return captains;
+    } catch (error) {
+        console.error('[maps.service] Error finding captains:', error);
         throw error;
     }
 }

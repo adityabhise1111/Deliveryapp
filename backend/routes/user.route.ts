@@ -2,6 +2,10 @@ import express ,{ Request, Response } from "express";
 import { body } from "express-validator";
 import { registerUser, loginUser, getUserProfile, logoutUser } from "../controllers/user.controller";
 import { authUser } from "../middlewares/auth.middleware";
+
+
+
+
 const router = express.Router();
 
 router.post("/register",[

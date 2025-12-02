@@ -2,9 +2,20 @@ import React, { useState } from 'react'
 import travis_kalanick from '../assets/travis_kalanick.jpeg'
 import { Link } from 'react-router-dom';
 
+interface Ride {
+    _id: string;
+    user: string;
+    pickup: string;
+    destination: string;
+    fare: number;
+    status: string;
+    otp: string;
+}
+
 interface ConfirmRidePopUpProps {
     setconfirmRidePopUpPanel: React.Dispatch<React.SetStateAction<boolean>>;
     setridePopUpPanel: React.Dispatch<React.SetStateAction<boolean>>;
+    ride: Ride | null;
 }
 
 const ConfirmRidePopUp: React.FC<ConfirmRidePopUpProps> = (props) => {
@@ -40,21 +51,21 @@ const ConfirmRidePopUp: React.FC<ConfirmRidePopUpProps> = (props) => {
                     <div className='flex items-center gap-5 p-3 border-b-2 border-gray-200'>
                         <i className='text-lg ri-map-pin-2-fill'></i>
                         <div>
-                            <h3 className='text-lg font-medium'>123/11-Ab</h3>
-                            <p className='text-sm mt-1 text-gray-600 '>Sawant Vasti , Baramati</p>
+                            <h3 className='text-lg font-medium'>Pickup</h3>
+                            <p className='text-sm mt-1 text-gray-600 '>{props.ride?.pickup || 'N/A'}</p>
                         </div>
                     </div>
                     <div className='flex items-center gap-5 p-3 border-b-2 border-gray-200'>
                         <i className="ri-square-fill"></i>
                         <div>
-                            <h3 className='text-lg font-medium'>654/11-Ab</h3>
-                            <p className='text-sm mt-1 text-gray-600 '>Sawant Vasti, Baramati</p>
+                            <h3 className='text-lg font-medium'>Destination</h3>
+                            <p className='text-sm mt-1 text-gray-600 '>{props.ride?.destination || 'N/A'}</p>
                         </div>
                     </div>
                     <div className='flex items-center gap-5 p-3'>
                         <i className="ri-wallet-2-fill"></i>
                         <div>
-                            <h3 className='text-lg font-medium'>₹178.28</h3>
+                            <h3 className='text-lg font-medium'>₹{props.ride?.fare.toFixed(2) || '0.00'}</h3>
                             <p className='text-sm mt-1 text-gray-600 '>Cash</p>
                         </div>
                     </div>
@@ -65,7 +76,7 @@ const ConfirmRidePopUp: React.FC<ConfirmRidePopUpProps> = (props) => {
                     }}>
                         <input onChange={(e)=>{
                             setotp(Number(e.target.value));
-                        }} value={otp}  className='bg-[#eee] px-6 py-4 text-lg mt-3 w-full font-mono rounded-lg  ' type="number" placeholder='Enter OTP' />
+                        }} value={otp}  className='bg-[#eee] px-6 py-4 text-lg mt-3 w-full font-mono rounded-lg  ' type="text" placeholder={`Enter OTP (Sent: ${props.ride?.otp || 'N/A'})`} />
                         <Link to='/captain-riding' className=' flex items-center justify-center mt-5 w-full bg-green-500 text-white font-semibold p-3 rounded-lg ' >
                             Confirm
                         </Link>

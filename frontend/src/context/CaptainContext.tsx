@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import type { User } from './UserContext';
 
 export interface Captain extends User {
+    user: any;
     vehicle?: {
         color: string;
         plate: string;

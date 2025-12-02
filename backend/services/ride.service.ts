@@ -2,7 +2,7 @@ import RideModel from "../model/ride.model";
 import { getDistanceAndTime } from "./maps.service";
 import crypto from "crypto";
 
-async function getFare(pickup: string, destination: string): Promise<{
+export async function getFare(pickup: string, destination: string): Promise<{
     auto: number;
     car: number;
     motorcycle: number;

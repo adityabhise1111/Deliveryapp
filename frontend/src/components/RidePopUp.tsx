@@ -1,9 +1,20 @@
 import React from 'react'
 import travis_kalanick from '../assets/travis_kalanick.jpeg'
 
+interface Ride {
+    _id: string;
+    user: string;
+    pickup: string;
+    destination: string;
+    fare: number;
+    status: string;
+    otp: string;
+}
+
 interface RidePopUp {
     setridePopUpPanel: React.Dispatch<React.SetStateAction<boolean>>;
     setconfirmRidePopUpPanel: React.Dispatch<React.SetStateAction<boolean>>;
+    ride: Ride | null;
 }
 
 const RidePopUp: React.FC<RidePopUp> = (props) => {
@@ -34,21 +45,21 @@ const RidePopUp: React.FC<RidePopUp> = (props) => {
                     <div className='flex items-center gap-5 p-3 border-b-2 border-gray-200'>
                         <i className='text-lg ri-map-pin-2-fill'></i>
                         <div>
-                            <h3 className='text-lg font-medium'>123/11-Ab</h3>
-                            <p className='text-sm mt-1 text-gray-600 '>Sawant Vasti , Baramati</p>
+                            <h3 className='text-lg font-medium'>Pickup</h3>
+                            <p className='text-sm mt-1 text-gray-600 '>{props.ride?.pickup || 'N/A'}</p>
                         </div>
                     </div>
                     <div className='flex items-center gap-5 p-3 border-b-2 border-gray-200'>
                         <i className="ri-square-fill"></i>
                         <div>
-                            <h3 className='text-lg font-medium'>654/11-Ab</h3>
-                            <p className='text-sm mt-1 text-gray-600 '>Sawant Vasti, Baramati</p>
+                            <h3 className='text-lg font-medium'>Destination</h3>
+                            <p className='text-sm mt-1 text-gray-600 '>{props.ride?.destination || 'N/A'}</p>
                         </div>
                     </div>
                     <div className='flex items-center gap-5 p-3'>
                         <i className="ri-wallet-2-fill"></i>
                         <div>
-                            <h3 className='text-lg font-medium'>₹178.28</h3>
+                            <h3 className='text-lg font-medium'>₹{props.ride?.fare.toFixed(2) || '0.00'}</h3>
                             <p className='text-sm mt-1 text-gray-600 '>Cash</p>
                         </div>
                     </div>

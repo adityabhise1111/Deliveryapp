@@ -11,13 +11,14 @@ interface locationSearchPanelProps {
     destination: string;
     setPickup: React.Dispatch<React.SetStateAction<string>>;
     setDestination: React.Dispatch<React.SetStateAction<string>>;
+    activeInput?: 'pickup' | 'destination' | null;
 }
 
 const LocationSearchPanel :React.FC<locationSearchPanelProps> = (props ) => {
   return (
     <div>
         {/* Show pickup suggestions when typing in pickup field */}
-        {props.pickup.length >= 3 && (
+                {props.activeInput === 'pickup' && props.pickup.length >= 3 && (
           <div>
             <h3 className='text-sm font-semibold mb-2 px-3'>Pickup Suggestions:</h3>
             {props.pickupSuggestions && props.pickupSuggestions.length > 0 ? (
@@ -45,17 +46,17 @@ const LocationSearchPanel :React.FC<locationSearchPanelProps> = (props ) => {
         )}
 
         {/* Show destination suggestions when typing in destination field */}
-        {props.destination.length >= 3 && (
+                {props.activeInput === 'destination' && props.destination.length >= 3 && (
           <div>
             <h3 className='text-sm font-semibold mb-2 px-3 mt-4'>Destination Suggestions:</h3>
-            {props.destinationSuggestions && props.destinationSuggestions.length > 0 ? (
+                        {props.destinationSuggestions && props.destinationSuggestions.length > 0 ? (
                 props.destinationSuggestions.map((location, index) => (
                     <div 
                         onClick={() => {
                             props.setDestination(location);
                             props.setDestinationSuggestions([]);
-                            props.setVehiclePanel(true);
-                            props.setPanel(false);
+                            // props.setVehiclePanel(true);
+                            // props.setPanel(false);
                         }} 
                         key={`destination-${index}`} 
                         className='flex items-center justify-start cursor-pointer gap-4 border-2 p-3 rounded-xl active:border-black my-2 hover:border-gray-400'

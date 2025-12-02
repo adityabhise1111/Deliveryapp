@@ -7,10 +7,14 @@ import captainRoutes from './routes/captain.routes';
 import mapRoutes from './routes/maps.routes';
 import ridesRoutes from './routes/ride.routes';
 import cookieParser from 'cookie-parser';
+// Import models to ensure they are registered
+import './model/user.model';
+import './model/captain.model';
+import './model/ride.model';
 
 
 dotenv.config();
-connectToDB()
+connectToDB();
 
 const app : Application = express()
 
@@ -21,6 +25,8 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/users', userRoutes);
 app.use('/captains', captainRoutes);
+
+
 app.use('/maps', mapRoutes);   
 app.use('/rides',ridesRoutes); 
 

@@ -26,6 +26,10 @@ const CaptainProtectWrapper = ({ children }: { children: React.ReactNode }) => {
             const response: AxiosResponse = await axios.get(`${import.meta.env.VITE_BASE_URL}/captains/profile`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
+            if(response.status === 200){
+                console.log('[UserProtectWrapper] Token valid, user authenticated');
+                context?.setCaptain(response.data);
+            }
             if (response.status !== 200) {
                 console.log('[CaptainProtectWrapper] Invalid token, redirecting to /captain-login');
                 localStorage.removeItem('token');

@@ -1,8 +1,8 @@
 import express from "express";
 import { Request, Response ,NextFunction} from "express";
 import { authUser,authCaptain } from "../middlewares/auth.middleware";
-import {body} from "express-validator";
-import { createRideController } from "../controllers/ride.controller";
+import {body,query} from "express-validator";
+import { createRideController ,getFares } from "../controllers/ride.controller";
 
 
 const router = express.Router();
@@ -15,6 +15,11 @@ router.post('/create' ,
     createRideController
   
 )
+
+router.get('/get-fares',
+    query('pickup').isString().withMessage('Pickup location is required'),
+    query('destination').isString().withMessage('Destination is required'),
+    authUser ,getFares)
 
 
 

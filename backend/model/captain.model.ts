@@ -60,7 +60,6 @@ const CaptainSchema = new Schema<ICaptain>({
             type: String,
             required: true,
             minlength:[3, "Color must be at least 3 characters long"]
-
         },
         plate: {
             type: String,
@@ -77,15 +76,15 @@ const CaptainSchema = new Schema<ICaptain>({
             required: true,
             enum: ['bike', 'car', 'truck', 'motorcycle'],
         },
-
-        
     },
     location:{
-        lat:{type: Number,},
-        lng:{ type: Number,}
-
+        ltd:{ type: Number },  // Keep as ltd since your DB already uses this
+        lng:{ type: Number }
     }
 });
+
+// Add geospatial index for $geoWithin queries
+CaptainSchema.index({ location: '2dsphere' });
 
 CaptainSchema.methods.generateAuthToken = function(): String {
     const token = jwt.sign(

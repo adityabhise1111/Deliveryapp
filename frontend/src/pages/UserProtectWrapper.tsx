@@ -25,6 +25,10 @@ const UserProtectWrapper = ({children}: {children: React.ReactNode}) => {
             const response: AxiosResponse = await axios.get(`${import.meta.env.VITE_BASE_URL}/users/profile`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
+            if(response.status === 200){
+                console.log('[UserProtectWrapper] Token valid, user authenticated');
+                context?.setUser(response.data);
+            }
             if (response.status !== 200) {
                 console.log('[UserProtectWrapper] Invalid token, redirecting to /User-login');
                 localStorage.removeItem('token');

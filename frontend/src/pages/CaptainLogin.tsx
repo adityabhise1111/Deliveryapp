@@ -19,6 +19,7 @@ const CaptainLogin: React.FC = () => {
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [captainData, setCaptainData] = useState<CaptainLoginData | {}>({});
+    const [kapil, setkapil] = useState("")
 
     const submitHandler = async(e: React.FormEvent<HTMLFormElement>): void => {
         e.preventDefault();

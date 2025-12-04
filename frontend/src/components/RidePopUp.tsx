@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import travis_kalanick from '../assets/travis_kalanick.jpeg'
 
 interface Ride {
@@ -15,9 +15,11 @@ interface RidePopUp {
     setridePopUpPanel: React.Dispatch<React.SetStateAction<boolean>>;
     setconfirmRidePopUpPanel: React.Dispatch<React.SetStateAction<boolean>>;
     ride: Ride | null;
+    confirmRide: () => void; 
 }
 
 const RidePopUp: React.FC<RidePopUp> = (props) => {
+    
     return (
         <div>
             <h5 onClick={() => {
@@ -31,7 +33,7 @@ const RidePopUp: React.FC<RidePopUp> = (props) => {
                 }} className='flex items-center gap-3 justify-between mt-3  bg-yellow-400 rounded-lg p-3'>
                     <div className='flex object-center items-center gap-3'>
                         <img className='h-12 w-12 rounded-full ' src={travis_kalanick} alt="" />
-                        <h5 className='text-xl font-semibold'>Travis Kalanick</h5>
+                        <h5 className='text-xl font-semibold'>{props?.ride?.user?.fullName?.firstName}</h5>
                     </div>
                     <h5>3.4 KM</h5>
                 </div>
@@ -67,6 +69,7 @@ const RidePopUp: React.FC<RidePopUp> = (props) => {
                 <div className="flex gap-3 w-full">
                     <button onClick={() => {
                         props.setconfirmRidePopUpPanel(true);
+                        props.confirmRide();
                     }} className=' mt-5 w-full bg-green-500 text-white font-semibold p-3 rounded-lg ' >
                         Accept
                     </button>

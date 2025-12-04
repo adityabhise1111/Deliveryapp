@@ -14,21 +14,28 @@ interface LookingForDriverProps {
   fares: any;
 }
 
-const LookingForDriver:React.FC<LookingForDriverProps> =(props) => {
+const LookingForDriver: React.FC<LookingForDriverProps> = (props) => {
   const vehicle = props.selectedVehicle as string;
-  
+
   let vehicleImage: ReactNode;
-  if(props.selectedVehicle === 'car'){
+  if (props.selectedVehicle === 'car') {
     vehicleImage = <img src={car} alt="Car" className="vehicle" />
-  }else if(props.selectedVehicle === 'motorcycle'){
+  } else if (props.selectedVehicle === 'motorcycle') {
     vehicleImage = <img src={moto} alt="Bike" className="vehicle" />
-  }else if(props.selectedVehicle === 'auto'){
+  } else if (props.selectedVehicle === 'auto') {
     vehicleImage = <img src={auto} alt="Auto" className="vehicle" />
   }
 
   return (
     <div className='bg-white'>
-      <h3 className='text-2xl font-semibold mb-4  '> Looking for Vehicle</h3>
+      <h5 onClick={() => {
+        props.setLookingForRidePanel(false);
+      }}
+        className=" text-center  justify-centre items-center p-1">
+        <i className="text-gray-200 text-3xl ri-arrow-down-wide-line ">
+        </i>
+      </h5>
+      <h3 className='text-2xl font-semibold mb-4  '> Looking for Driver</h3>
 
       <div className="confirmvehicle flex flex-col justify-between items-center ">
         {vehicleImage}
@@ -49,12 +56,12 @@ const LookingForDriver:React.FC<LookingForDriverProps> =(props) => {
           </div>
           <div className='flex items-center gap-5 p-3'>
             <i className="ri-wallet-2-fill"></i>
-            <div onClick={()=>{
-                props.setLookingForRidePanel(false)
-                props.setWaitingForDriverPanel(true)
-              }}> {/* remove this its for testing only */} 
+            <div onClick={() => {
+              props.setLookingForRidePanel(false)
+              props.setWaitingForDriverPanel(true)
+            }}> {/* remove this its for testing only */}
               <h3 className='text-3xl font-medium'>₹{props.fares[vehicle]}</h3>
-              <p  className='text-sm mt-1 text-gray-600 '>Cash</p>
+              <p className='text-sm mt-1 text-gray-600 '>Cash</p>
             </div>
           </div>
         </div>

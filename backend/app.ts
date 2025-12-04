@@ -14,14 +14,20 @@ import './model/ride.model';
 
 
 dotenv.config();
+
+
 connectToDB();
 
-const app : Application = express()
+const app  = express()
 
 app.use(cors());
+
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
+
+
 
 app.use('/users', userRoutes);
 app.use('/captains', captainRoutes);

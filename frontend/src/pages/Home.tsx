@@ -12,11 +12,33 @@ import WaitingForDriver from '../components/WaitingForDriver'
 import axios from 'axios'
 import { SocketContext } from '../context/SocketContext'
 import { UserDataContext } from '../context/UserContext'
+
 export interface Fares {
   auto: number;
   bike: number;
   car: number;
 }
+export interface Ride {
+  _id: string;
+  user: string; // User ID as string
+  captain?: string; // Captain ID as string
+  pickup: string;
+  destination: string;
+  fare: number;
+  status: 'pending' | 'accepted' | 'ongoing' | 'completed' | 'cancelled';
+  duration?: number; // in seconds
+  distance?: number; // in meters
+  paymentId?: string;
+  orderId?: string;
+  signature?: string;
+  otp?: string;
+}
+
+export interface RideEvent {
+  event: string;
+  data: Ride;
+}
+
 
 const Home: React.FC = () => {
   const [pickup, setPickup] = useState<string>('');
@@ -31,6 +53,7 @@ const Home: React.FC = () => {
   const [destinationSuggestions, setDestinationSuggestions] = useState<Array<string>>([])
   const [activeInput, setActiveInput] = useState<'pickup' | 'destination' | null>(null);
   const [fares, setFares] = useState<Fares>({});
+  const [ride, setRide] = useState<Ride | null>(null); // ✅ ADD THIS
 
   const panelRef = useRef<HTMLDivElement>(null);
   const vehiclePanelRef = useRef<HTMLDivElement>(null);
@@ -38,19 +61,36 @@ const Home: React.FC = () => {
   const confirmRidePanelRef = useRef<HTMLDivElement>(null);
   const vehicleFoundRef = useRef(null)
   const waitingForDriverRef = useRef(null)
+  const { socket } = useContext(SocketContext)
 
   const { sendMessage, receiveMessage } = useContext(SocketContext)
   const { user } = useContext(UserDataContext) || { user: null };
+  
   useEffect(() => {
     if (user && user.user && user.user._id) {
       console.log('[Home ]: sending message with id', user.user._id);
-      sendMessage('join', {role: 'user', userId: user.user._id});
-      } else {
+      sendMessage('join', { role: 'user', userId: user.user._id });
+    } else {
       console.log('User data is still loading or incomplete:', user);
     }
-  }, [user]);
+  }, [user, sendMessage]);
 
+  useEffect(() => {
+    if (!socket) return;
 
+    const handleRideConfirmed = (rideData: Ride) => {
+      console.log('[Home]: Ride confirmed received:', rideData);
+      setRide(rideData); // ✅ Store the ride data
+      setLookingForRidePanel(false);
+      setWaitingForDriverPanel(true);
+    };
+
+    socket.on('ride-confirmed', handleRideConfirmed);
+
+    return () => {
+      socket.off('ride-confirmed', handleRideConfirmed);
+    };
+  }, [socket]);
 
   const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -218,13 +258,11 @@ const Home: React.FC = () => {
         }
       );
       console.log('Ride created:', response.data);
+      setRide(response.data); // ✅ Store the created ride
     } catch (error) {
       console.error('Error creating ride:', error);
     }
   }
-
-
-
 
   return (
     <div className='h-screen relative overflow-hidden'>
@@ -233,10 +271,10 @@ const Home: React.FC = () => {
         <img className="h-full w-full object-cover " src={image} alt="map" />
       </div>
       <div className="flex flex-col justify-end h-screen absolute top-0 w-full ">
-        <div className={`bg-white h-[30%] p-5 ${panel ? ' ' : 'rounded-t-3xl'}`}>
+        <div className={`bg-white h-[50%] p-5 ${panel ? ' ' : 'rounded-t-3xl'}`}>
           <h4 className='text-3xl semi-bold'>Find a trip</h4>
           <h5 onClick={() => { setPanel(false) }} ref={panelCloseRef}
-            className='top-6 right-5 absolute font-bold'><i className="ri-arrow-down-wide-line"></i></h5>
+            className='top-6 right-5 absolute font-bold '><i className="ri-arrow-down-wide-line"></i></h5>
           <form onSubmit={submitHandler}>
             <div className="line absolute w-1 bg-gray-900 h-14 mt-6 mx-5  rounded-full"></div>
             <input
@@ -260,13 +298,13 @@ const Home: React.FC = () => {
               onFocus={() => setActiveInput('destination')}
               className='bg-[#eee] px-12 py-2 text-lg rounded-lg my-1 w-full' type="text" name="" placeholder='Enter Your Destination' id=""
             />
-            <button className='bg-black text-lg text-white rounded-lg px-4 py-2 mt-1 w-full'
+            <button className='bg-black text-lg text-white rounded-lg px-4 py-2 w-full'
               onClick={findTrip}
             >Find Trip</button>
           </form>
         </div>
 
-        <div ref={panelRef} className='h-[0%] bg-white '>
+        <div ref={panelRef} className='h-[0%]  bg-white '>
           <LocationSearchPanel
             setPanel={setPanel}
             setVehiclePanel={setVehiclePanel}
@@ -305,7 +343,10 @@ const Home: React.FC = () => {
       </div>
 
       <div ref={waitingForDriverRef} className="lookingForRide bg-white fixed w-full z-10 bottom-0 translate-y-full px-3 py-8 rounded-2xl">
-        <WaitingForDriver setWaitingForDriverPanel={setWaitingForDriverPanel} />
+        <WaitingForDriver 
+          setWaitingForDriverPanel={setWaitingForDriverPanel}
+          ride={ride}  // ✅ Now ride is defined
+        />
       </div>
     </div>
   )

@@ -8,6 +8,16 @@ import { authUser } from "../middlewares/auth.middleware";
 
 const router = express.Router();
 
+
+
+
+
+
+
+
+
+
+
 router.post("/register",[
     body("email").isEmail().withMessage("Invalid email format"),
     body("password").isLength({min: 6}).withMessage("Password must be at least 6 characters long"),
@@ -15,6 +25,22 @@ router.post("/register",[
 ],
 registerUser //if validation passes, call registerUser controller
 )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 router.post("/login",[
     body("email").isEmail().withMessage("Invalid email format"),

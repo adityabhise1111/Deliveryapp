@@ -104,37 +104,14 @@ const CaptainHome: React.FC = () => {
     }
   }, [confirmRidePopUpPanel]);
 
-  async function confirmRide(): Promise<Object | void> {
-    try {
-      console.log("rideId", ride?._id);
-      console.log("captainId", captain?.user?._id);
-      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/confirm`, {
-        rideId: ride?._id,
-        captainId: captain?.user._id,
-
-
-      }, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      })
-      console.log("response", response);
-      if (response.status === 200) {
-        console.log("[CaptainHome]: Ride confirmed successfully", response.data);
-        setridePopUpPanel(false);
-        setconfirmRidePopUpPanel(true);
-        return response.data;
-      }
-      if (response.status !== 200) {
-        console.error("[CaptainHome]: Failed to confirm ride", response.data);
-      }
-
-    } catch (error) {
-      console.error("[CaptainHome]: Error confirming ride:", error);
-
-    }
-
-
+  async function confirmRide():Promise<Object | void> {
+    const response = axios.post(`${import.meta.env.VITE_BASE_URL}/rides/confirm`,{
+      rideId: ride?._id,
+      captainId: captain?._id
+    })
+    setridePopUpPanel(false);
+    setconfirmRidePopUpPanel(true);
+    
   }
 
   return (
@@ -153,18 +130,18 @@ const CaptainHome: React.FC = () => {
       </div>
 
       <div ref={riderPopUpRef} className="translate-y-full bg-white fixed w-full z-10 bottom-0 px-3 py-8 rounded-2xl">
-        <RidePopUp
+        <RidePopUp 
           ride={ride}
-          setridePopUpPanel={setridePopUpPanel}
+          setridePopUpPanel={setridePopUpPanel} 
           setconfirmRidePopUpPanel={setconfirmRidePopUpPanel}
-          confirmRide={confirmRide}
+          confirmRide={confirmRide} 
         />
       </div>
       <div ref={confirmRiderPopUpRef} className="translate-y-full bg-white fixed w-full h-screen z-10 bottom-0 px-3 py-8 rounded-2xl">
-        <ConfirmRidePopUp
+        <ConfirmRidePopUp 
           ride={ride}
-          setconfirmRidePopUpPanel={setconfirmRidePopUpPanel}
-          setridePopUpPanel={setridePopUpPanel}
+          setconfirmRidePopUpPanel={setconfirmRidePopUpPanel} 
+          setridePopUpPanel={setridePopUpPanel} 
         />
       </div>
     </div>

@@ -125,3 +125,4 @@ export async function logoutCaptain(req: Request, res: Response): Promise<void> 
     res.status(200).json({ message: "Logged out successfully" });
     return;
 }
+

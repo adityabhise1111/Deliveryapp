@@ -67,6 +67,10 @@ userSchema.methods.hashPassword = async function(password: string): Promise<stri
     return await bcrypt.hash(password, 10);
 }  
 
+
+
+
+
 const userModel = mongoose.model <IUser> ('User', userSchema);
 
 export default userModel;

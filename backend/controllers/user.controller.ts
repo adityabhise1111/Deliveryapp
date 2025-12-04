@@ -5,6 +5,18 @@ import bcrypt from "bcrypt";
 import userModel from "../model/user.model";
 import blacklistTokenModel from "../model/blacklistToken.model";
 
+
+
+
+
+
+
+
+
+
+
+
+
 export async function registerUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     console.log("Registration request received");
     const errors = validationResult(req);
@@ -18,18 +30,19 @@ export async function registerUser(req: Request, res: Response, next: NextFuncti
         email: req.body.email,
         password: req.body.password
     };
+
     const isEmailExist = await userModel.findOne({ email });
+    
     if (isEmailExist) {
         res.status(400).json({ message: "Email already exists" });
         return;
     }
 
-
-
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const user = await createUser(firstName, lastName, email, hashedPassword);
+
         const token = user.generateAuthToken();
 
         res.status(201).json({ token, user });
@@ -42,11 +55,32 @@ export async function registerUser(req: Request, res: Response, next: NextFuncti
         }
 
         res.status(500).json({ message: error.message || "Internal server error" });
-
     }
 
 
+
+
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 export async function loginUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     console.log("Login request received");

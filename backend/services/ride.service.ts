@@ -1,6 +1,9 @@
-import RideModel from "../model/ride.model";
+import RideModel, { IRide } from "../model/ride.model";
 import { getDistanceAndTime } from "./maps.service";
+
 import crypto from "crypto";
+import {ICaptain} from "../model/captain.model";
+import { validationResult } from "express-validator";
 
 export async function getFare(pickup: string, destination: string): Promise<{
     auto: number;
@@ -66,4 +69,29 @@ export async function createRide(user:string , pickup:string, destination:string
     return await newRide.save();
 }
 
+export async function confirmRide({rideId, captainId }: { rideId: string; captainId: string }): Promise<any> {
+    
+    if (!rideId || !captainId) {
+        throw new Error("Ride ID and Captain ID are required to confirm a ride.");
+    }
+    try {
+        console.log('[Ride Service]: Confirming ride with rideId:', rideId, 'captainId:', captainId);
+        
+        const ride = await RideModel.findOneAndUpdate(
+            { _id: rideId },
+            { status: 'accepted', captain: captainId },
+            { new: true }
+        ).populate('captain');
+        
+        if (!ride) {
+            throw new Error("Ride not found.");
+        }
+        
+        console.log('[Ride Service]: Ride confirmed successfully:', ride);
+        return ride;
+    } catch (error: any) {
+        console.error('[Ride Service]: Error confirming ride:', error.message);
+        throw new Error(error.message); 
+    }
+}
 

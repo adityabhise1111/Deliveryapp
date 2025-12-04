@@ -78,7 +78,7 @@ const LocationSearchPanel :React.FC<locationSearchPanelProps> = (props ) => {
         {/* Show initial message when neither field has enough characters */}
         {props.pickup.length < 3 && props.destination.length < 3 && (
             <div className='p-4 text-gray-500 text-center'>
-                Type at least 3 characters to see suggestions...
+                Type at least 30 characters to see suggestions...
             </div>
         )}
     </div> 

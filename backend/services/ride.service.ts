@@ -83,7 +83,8 @@ export async function confirmRide({rideId, captainId }: { rideId: string; captai
             { new: true }
         )
         .populate('user', 'fullName email socketId')  // ✅ Populate user
-        .populate('captain', 'fullName vehicle');     // ✅ Populate captain
+        .populate('captain', 'fullName vehicle')     // ✅ Populate captain
+        .select('+otp')
         
         if (!ride) {
             throw new Error("Ride not found.");

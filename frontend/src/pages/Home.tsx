@@ -65,7 +65,7 @@ const Home: React.FC = () => {
 
   const { sendMessage, receiveMessage } = useContext(SocketContext)
   const { user } = useContext(UserDataContext) || { user: null };
-  
+
   useEffect(() => {
     if (user && user.user && user.user._id) {
       console.log('[Home ]: sending message with id', user.user._id);
@@ -91,6 +91,13 @@ const Home: React.FC = () => {
       socket.off('ride-confirmed', handleRideConfirmed);
     };
   }, [socket]);
+  const handleRideConfirmed = (rideData: Ride) => {
+    console.log('[Home]: Ride confirmed received:', rideData);
+    setRide(rideData); // ✅ Store the ride data
+    setLookingForRidePanel(false);
+    setWaitingForDriverPanel(true);
+  };
+  socket.on('ride-confirmed', handleRideConfirmed);
 
   const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -343,7 +350,7 @@ const Home: React.FC = () => {
       </div>
 
       <div ref={waitingForDriverRef} className="lookingForRide bg-white fixed w-full z-10 bottom-0 translate-y-full px-3 py-8 rounded-2xl">
-        <WaitingForDriver 
+        <WaitingForDriver
           setWaitingForDriverPanel={setWaitingForDriverPanel}
           ride={ride}  // ✅ Now ride is defined
         />

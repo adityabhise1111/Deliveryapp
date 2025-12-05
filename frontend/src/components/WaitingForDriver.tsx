@@ -58,6 +58,8 @@ const WaitingForDriver: React.FC<WaitingForDriverProps> = (props) => {
     const pickup = props.ride?.pickup || 'Pickup Location';
     const destination = props.ride?.destination || 'Destination Location';
     const fare = props.ride?.fare || 0;
+    const otp = props.ride?.otp || 'N/A';
+    
 
     return (
         <div className='bg-white'>
@@ -78,6 +80,13 @@ const WaitingForDriver: React.FC<WaitingForDriverProps> = (props) => {
             </div>
             <div className="confirmvehicle flex flex-col justify-between items-center ">
                 <div className="details my-4 w-full mt-5">
+                    <div className='flex items-center gap-5 p-3 border-b-2 border-gray-200'>
+                        <i className='text-lg ri-map-pin-2-fill'></i>
+                        <div>
+                            <h3 className='text-lg font-medium'>OTP</h3>
+                            <p className='text-sm mt-1 text-gray-600 '>{otp}</p>
+                        </div>
+                    </div>
                     <div className='flex items-center gap-5 p-3 border-b-2 border-gray-200'>
                         <i className='text-lg ri-map-pin-2-fill'></i>
                         <div>

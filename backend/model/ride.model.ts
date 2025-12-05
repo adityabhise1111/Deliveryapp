@@ -60,7 +60,7 @@ const RiderSchema = new mongoose.Schema <IRide>({
     },
     otp:{
         type: String,
-        select: false,
+        select: true,
         required: true,
     }
 

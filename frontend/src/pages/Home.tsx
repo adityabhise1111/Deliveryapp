@@ -78,8 +78,30 @@ const Home: React.FC = () => {
   useEffect(() => {
     if (!socket) return;
 
-    const handleRideConfirmed = (rideData: Ride) => {
+    const handleRideConfirmed = async(rideData: Ride) => {
       console.log('[Home]: Ride confirmed received:', rideData);
+      try {
+        console.log('[Home]: finding ride');
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL || 'http://localhost:4000'}/rides/get-otp?rideId=${rideData._id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+          }
+        )
+        if (response.data && response.data.otp) {
+          rideData.otp = response.data.otp;
+          console.log('[Home]: OTP fetched successfully:', rideData.otp);
+        } else {
+          console.warn('[Home]: OTP not found in response');
+          throw new Error(response.data);
+        }
+
+      } catch (error:any) {
+        console.log('Error :',error.message);
+        console.error('[Home]: Error fetching OTP:', error);
+      }
       setRide(rideData); // ✅ Store the ride data
       setLookingForRidePanel(false);
       setWaitingForDriverPanel(true);

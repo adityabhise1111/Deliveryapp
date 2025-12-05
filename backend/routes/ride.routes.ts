@@ -2,7 +2,7 @@ import express from "express";
 import { Request, Response ,NextFunction} from "express";
 import { authUser,authCaptain } from "../middlewares/auth.middleware";
 import {body,query} from "express-validator";
-import { createRideController,confirmRideController ,getFares } from "../controllers/ride.controller";
+import { createRideController,confirmRideController ,getFares,getOtp } from "../controllers/ride.controller";
 
 
 const router = express.Router();
@@ -25,6 +25,14 @@ router.post('/confirm',
 router.get('/get-fares',
     query('pickup').isString().withMessage('Pickup location is required'),
     query('destination').isString().withMessage('Destination is required'),
-    authUser ,getFares)
+    authUser ,
+    getFares
+)
+
+router.get('/get-otp',
+    query('rideId').isMongoId().withMessage('invalid ride ID'),
+    authUser ,
+    getOtp
+)
 
 export default router;

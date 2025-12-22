@@ -15,24 +15,11 @@ import { UserDataContext } from '../context/UserContext'
 
 export interface Fares {
   auto: number;
-  bike: number;
+  motorcycle: number;
   car: number;
 }
-export interface Ride {
-  _id: string;
-  user: string; // User ID as string
-  captain?: string; // Captain ID as string
-  pickup: string;
-  destination: string;
-  fare: number;
-  status: 'pending' | 'accepted' | 'ongoing' | 'completed' | 'cancelled';
-  duration?: number; // in seconds
-  distance?: number; // in meters
-  paymentId?: string;
-  orderId?: string;
-  signature?: string;
-  otp?: string;
-}
+
+import { type IRide as Ride } from '../components/WaitingForDriver';
 
 export interface RideEvent {
   event: string;
@@ -44,7 +31,7 @@ const Home: React.FC = () => {
   const [pickup, setPickup] = useState<string>('');
   const [destination, setDestination] = useState<string>("");
   const [panel, setPanel] = useState<boolean>(false);
-  const [selectedVehicle, setSelectedVehicle] = useState<string | null>(null);
+  const [selectedVehicle, setSelectedVehicle] = useState<string | undefined>(undefined);
   const [vehiclePanel, setVehiclePanel] = useState<boolean>(false)
   const [confirmRidePanel, setConfirmRidePanel] = useState<boolean>(false);
   const [lookingForRidePanel, setLookingForRidePanel] = useState<boolean>(false);
@@ -52,7 +39,7 @@ const Home: React.FC = () => {
   const [pickupSuggestions, setPickupSuggestions] = useState<Array<string>>([])
   const [destinationSuggestions, setDestinationSuggestions] = useState<Array<string>>([])
   const [activeInput, setActiveInput] = useState<'pickup' | 'destination' | null>(null);
-  const [fares, setFares] = useState<Fares>({});
+  const [fares, setFares] = useState<Fares>({ auto: 0, motorcycle: 0, car: 0 });
   const [ride, setRide] = useState<Ride | null>(null); // ✅ ADD THIS
 
   const panelRef = useRef<HTMLDivElement>(null);
@@ -63,7 +50,7 @@ const Home: React.FC = () => {
   const waitingForDriverRef = useRef(null)
   const { socket } = useContext(SocketContext)
 
-  const { sendMessage, receiveMessage } = useContext(SocketContext)
+  const { sendMessage } = useContext(SocketContext)
   const { user } = useContext(UserDataContext) || { user: null };
 
   useEffect(() => {
@@ -78,30 +65,8 @@ const Home: React.FC = () => {
   useEffect(() => {
     if (!socket) return;
 
-    const handleRideConfirmed = async(rideData: Ride) => {
-      // console.log('[Home]: Ride confirmed received:', rideData);
-      // try {
-      //   console.log('[Home]: finding ride');
-      //   const response = await axios.get(
-      //     `${import.meta.env.VITE_API_URL || 'http://localhost:4000'}/rides/get-otp?rideId=${rideData._id}`,
-      //     {
-      //       headers: {
-      //         Authorization: `Bearer ${localStorage.getItem('token')}`,
-      //       },
-      //     }
-      //   )
-      //   if (response.data && response.data.otp) {
-      //     rideData.otp = response.data.otp;
-      //     console.log('[Home]: OTP fetched successfully:', rideData.otp);
-      //   } else {
-      //     console.warn('[Home]: OTP not found in response');
-      //     throw new Error(response.data);
-      //   }
-
-      // } catch (error:any) {
-      //   console.log('Error :',error.message);
-      //   console.error('[Home]: Error fetching OTP:', error);
-      // }
+    const handleRideConfirmed = async (rideData: Ride) => {
+      console.log('[Home]: Ride confirmed received:', rideData);
       setRide(rideData); // ✅ Store the ride data
       setLookingForRidePanel(false);
       setWaitingForDriverPanel(true);
@@ -244,30 +209,35 @@ const Home: React.FC = () => {
 
   }, [destination])
 
+  interface FaresResponse {
+    fares: Fares;
+  }
+
   const findTrip = async () => {
     setVehiclePanel(true);
     setPanel(false);
 
     try {
-      const response = await axios.get<Fares>(
+      const response = await axios.get<FaresResponse>(
         `${import.meta.env.VITE_API_URL || 'http://localhost:4000'}/rides/get-fares?pickup=${encodeURIComponent(pickup)}&destination=${encodeURIComponent(destination)}`,
         {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
+
       if (!response.data?.fares || Object.keys(response.data.fares).length === 0) {
         alert("No fares found for the selected routes");
         return;
       }
+
       setFares(response.data.fares);
       console.log('Fares fetched:', response.data.fares);
-
 
     } catch (error: any) {
       console.error('Error fetching fares:', error);
       alert(error.response?.data?.message || 'Failed to fetch fares');
-      setVehiclePanel(false); // Close panel on error
+      setVehiclePanel(false);
     }
   }
 

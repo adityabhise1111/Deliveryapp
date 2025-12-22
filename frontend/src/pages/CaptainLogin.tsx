@@ -97,7 +97,7 @@ const CaptainLogin: React.FC = () => {
             <div>
                 <Link to={"/login"}
                     className='bg-black flex justify-center text-white w-full py-3 rounded mt-2 text-xl'
-                >Submit</Link>
+                >SignIn as User</Link>
             </div>
         </div>
     )

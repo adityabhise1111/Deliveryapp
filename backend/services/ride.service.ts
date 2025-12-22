@@ -2,31 +2,32 @@ import RideModel, { IRide } from "../model/ride.model";
 import { getDistanceAndTime } from "./maps.service";
 
 import crypto from "crypto";
-import {ICaptain} from "../model/captain.model";
+import { ICaptain } from "../model/captain.model";
 import { validationResult } from "express-validator";
+import { sendMessageToSocket } from "./socket";
 
 export async function getFare(pickup: string, destination: string): Promise<{
     auto: number;
     car: number;
     motorcycle: number;
 }> {
-    if(!pickup || !destination) {
-        throw new Error("Pickup and destination are required to calculate fare.");
+    if (!pickup || !destination) {
+        throw new Error("[Ride Service]:Pickup and destination are required to calculate fare.");
     }
 
     const distanceTime = await getDistanceAndTime(pickup, destination);
     if (!distanceTime) {
-        throw new Error("Could not calculate distance and time for fare calculation.");
+        throw new Error("[Ride Service]:Could not calculate distance and time for fare calculation.");
     }
     const distanceKm = typeof distanceTime.distance === "number"
-        ? distanceTime.distance/1000 //convert to km
+        ? distanceTime.distance / 1000 //convert to km
         : parseFloat(String(distanceTime.distance));
     const durationMin = (typeof distanceTime.duration === "number"
-        ? distanceTime.duration/60 //convert to minutes
+        ? distanceTime.duration / 60 //convert to minutes
         : parseFloat(String(distanceTime.duration))) / 60;
 
     if (!isFinite(distanceKm) || !isFinite(durationMin)) {
-        throw new Error("Invalid distance or duration returned from maps service.");
+        throw new Error("[Ride Service]:Invalid distance or duration returned from maps service.");
     }
 
     const rates = {
@@ -48,14 +49,14 @@ export async function getFare(pickup: string, destination: string): Promise<{
 
 }
 
-function getOtp(num:number): string {
-     return crypto.randomInt(Math.pow(10, num-1), Math.pow(10, num)).toString();
+function getOtp(num: number): string {
+    return crypto.randomInt(Math.pow(10, num - 1), Math.pow(10, num)).toString();
 }
 
 type VehicleType = 'auto' | 'car' | 'motorcycle';
-export async function createRide(user:string , pickup:string, destination:string, vehicleType:VehicleType): Promise<any> {
+export async function createRide(user: string, pickup: string, destination: string, vehicleType: VehicleType): Promise<any> {
     if (!user || !pickup || !destination || !vehicleType) {
-        throw new Error("All parameters are required to create a ride.");
+        throw new Error("[Ride Service]:All parameters are required to create a ride.");
     }
     const fare = await getFare(pickup, destination);
 
@@ -69,32 +70,64 @@ export async function createRide(user:string , pickup:string, destination:string
     return await newRide.save();
 }
 
-export async function confirmRide({rideId, captainId }: { rideId: string; captainId: string }): Promise<any> {
-    
+export async function confirmRide({ rideId, captainId }: { rideId: string; captainId: string }): Promise<any> {
+
     if (!rideId || !captainId) {
-        throw new Error("Ride ID and Captain ID are required to confirm a ride.");
+        throw new Error("[Ride Service]:Ride ID and Captain ID are required to confirm a ride.");
     }
     try {
         console.log('[Ride Service]: Confirming ride with rideId:', rideId, 'captainId:', captainId);
-        
+
         const ride = await RideModel.findOneAndUpdate(
             { _id: rideId },
             { status: 'accepted', captain: captainId },
             { new: true }
         )
-        .populate('user', 'fullName email socketId')  // ✅ Populate user
-        .populate('captain', 'fullName vehicle')     // ✅ Populate captain
-        .select('+otp')
-        
+            .populate('user', 'fullName email socketId')  // ✅ Populate user
+            .populate('captain', 'fullName vehicle')     // ✅ Populate captain
+            .select('+otp')
+
         if (!ride) {
-            throw new Error("Ride not found.");
+            throw new Error("[Ride Service]:Ride not found.");
         }
-        
+
         console.log('[Ride Service]: Ride confirmed successfully:', ride);
         return ride;
     } catch (error: any) {
         console.error('[Ride Service]: Error confirming ride:', error.message);
-        throw new Error(error.message); 
+        throw new Error(error.message);
     }
 }
 
+export async function startRideService({ rideId, otp, captain }: { rideId: string | undefined; otp: string | undefined; captain: ICaptain }): Promise<IRide> {
+    if (!rideId || !otp) {
+        throw new Error("[Ride Service]:Ride ID and OTP are required to start a ride.");
+    }
+    const ride = await RideModel.findOne({ _id: rideId });
+    if (!ride) {
+        throw new Error("[Ride Service]:Ride not found or invalid OTP.");
+    }
+    if (ride.status !== 'accepted') {
+        throw new Error("[Ride Service]:Ride cannot be started. Current status: " + ride.status);
+    }
+    if (ride.otp !== otp) {
+        throw new Error("[Ride Service]:Invalid OTP provided.");
+    }
+
+    try {
+        const response = await RideModel.findOneAndUpdate({
+            _id: rideId,
+        }, {
+            status: 'ongoing',
+        })
+            .populate('user', 'fullName email socketId')
+        if (!response) {
+            throw new Error("[Ride Service]:Failed to start the ride.");
+        }
+        return response;
+
+    } catch (error: any) {
+        throw new Error("[Ride Service]:Error starting the ride: " + (error as Error).message);
+        
+    }
+}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import car from '../assets/car.png'
 
 export interface ICaptain extends IUser {

@@ -76,7 +76,7 @@ export async function authCaptain(req: Request, res: Response, next: NextFunctio
 
         const captain = await captainModel.findById(decoded._id);
         if (!captain) {
-            res.status(401).json({ message: "User not found." });
+            res.status(401).json({ message: "[auth.middleware] captain not found." });
             return;
         }
         req.captain = captain;

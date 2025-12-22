@@ -4,11 +4,15 @@ import car from '../assets/car.png'
 import auto from '../assets/auto.png'
 
 interface vehiclePanelProps {
-    setSelectedVehicle: React.Dispatch<React.SetStateAction<string | null>>;
+    setSelectedVehicle: React.Dispatch<React.SetStateAction<string | undefined>>;
     setVehiclePanel: React.Dispatch<React.SetStateAction<boolean>>;
     selectedVehicle?: string | null;
     setConfirmRidePanel: React.Dispatch<React.SetStateAction<boolean>>;
-    fares :object;
+    fares :{
+        motorcycle: number;
+        auto: number;
+        car: number;
+    };
 }
 
 const VehiclePanel: React.FC<vehiclePanelProps> = (props) => {

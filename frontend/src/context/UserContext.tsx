@@ -2,6 +2,7 @@ import React, { createContext, useState } from 'react'
 import type { ReactNode } from 'react'
 
 export interface User {
+  user: User | null;
   fullName?: {
     firstName: string;
     lastName: string;

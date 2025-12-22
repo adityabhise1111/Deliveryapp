@@ -1,10 +1,11 @@
 import { validationResult } from "express-validator";
-import { createRide, confirmRide, getFare } from "../services/ride.service";
+import { createRide, confirmRide, getFare, startRideService } from "../services/ride.service";
 import e, { Request, Response, NextFunction } from "express";
 import { getAddressCoordinates, getCaptainsIntheRadius } from "../services/maps.service";
 import { sendMessageToSocket } from "../services/socket";
 import RideModel from "../model/ride.model";
 import { Socket } from "socket.io";
+import { send } from "process";
 
 
 interface RideRequestBody {
@@ -101,12 +102,12 @@ export async function confirmRideController(req: Request, res: Response): Promis
     console.log('[Ride Controller]: confirmRideController called with:', { rideId, captainId });
 
     if (!rideId) {
-        res.status(400).json({ message: "Ride ID is required" });
+        res.status(400).json({ message: "[Ride Controller]Ride ID is required" });
         return;
     }
 
     if (!captainId) {
-        res.status(400).json({ message: "Captain ID is required :-" + captainId });
+        res.status(400).json({ message: "[Ride Controller]Captain ID is required :-" + captainId });
         return;
     }
 
@@ -114,7 +115,7 @@ export async function confirmRideController(req: Request, res: Response): Promis
         const ride = await confirmRide({ rideId, captainId });
 
         if (!ride) {
-            res.status(404).json({ message: "Ride not found" });
+            res.status(404).json({ message: "[Ride Controller]Ride not found" });
             return;
         }
 
@@ -131,13 +132,13 @@ export async function confirmRideController(req: Request, res: Response): Promis
             console.warn('[Ride Controller]: User socketId not available:', ride.user);
         }
 
-        res.status(200).json({ message: "Ride confirmed successfully", ride });
+        res.status(200).json({ message: "[Ride Controller]Ride confirmed successfully", ride });
         return;
 
     } catch (error: any) {
         console.error("[Ride Controller]: Error confirming ride:", error.message);
         res.status(500).json({
-            message: "Internal server error",
+            message: "[Ride Controller]Internal server error",
             error: error.message
         });
         return;
@@ -173,5 +174,27 @@ export async function getOtp(req: Request, res: Response, next: NextFunction) {
         });
 
     }
+
+}
+
+export async function startRideController(req: Request, res: Response, next: NextFunction) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+    const { rideId,otp } = req.query;
+    try {
+        const ride = await startRideService({rideId,otp , captain:req.captain});
+
+        sendMessageToSocket(ride.user.socketId, {
+            event: "ride-started",
+            data: ride
+        });
+        return res.status(200).json({ message: "Ride started successfully", ride });
+
+    } catch (error: any) {
+        return res.status(500).json({ message: error.message });
+    }
+        
 
 }

@@ -966,3 +966,240 @@ Authorization: Bearer <your_captain_jwt_token>
 | `active` | Captain is available for rides (default) |
 | `inactive` | Captain is not accepting rides |
 | `suspended` | Captain account is suspended by admin |
+
+---
+
+## Ride Endpoints
+
+### 1. Create Ride (Protected - User)
+
+**Endpoint:** `POST /rides/create`
+
+**Description:**  
+Creates a new ride request with pickup and destination locations. The system calculates the fare based on distance and time. Nearby captains are notified via socket events.
+
+**Request Body:**
+```json
+{
+  "pickup": "string (required)",
+  "destination": "string (required)",
+  "vehicleType": "string (required - 'auto' | 'car' | 'motorcycle')"
+}
+```
+
+**Example Request:**
+```json
+{
+  "pickup": "bhosari",
+  "destination": "sant tukaram nagar",
+  "vehicleType": "car"
+}
+```
+
+**Authentication:** Required (User JWT token)
+
+**Success Response:**
+
+**Status Code:** `201 Created`
+```json
+{
+  "_id": "6908bd5ceb1d7313cd9883e9",
+  "user": "68fd3e1a831478f51f96df26",
+  "pickup": "bhosari",
+  "destination": "sant tukaram nagar",
+  "fare": 184.66,
+  "status": "pending",
+  "otp": "1479",
+  "__v": 0
+}
+```
+
+**Error Response:**
+
+**Status Code:** `400 Bad Request`
+```json
+{
+  "errors": [
+    {
+      "msg": "Pickup location is required"
+    }
+  ]
+}
+```
+
+---
+
+### 2. Confirm Ride (Protected - Captain)
+
+**Endpoint:** `POST /rides/confirm`
+
+**Description:**  
+Captain accepts and confirms a ride request. This changes the ride status from `pending` to `accepted` and assigns the captain to the ride. The user is notified via socket event.
+
+**Request Body:**
+```json
+{
+  "rideId": "string (required - valid MongoDB ObjectId)"
+}
+```
+
+**Example Request:**
+```json
+{
+  "rideId": "6908bd5ceb1d7313cd9883e9"
+}
+```
+
+**Authentication:** Required (Captain JWT token)
+
+**Success Response:**
+
+**Status Code:** `200 OK`
+```json
+{
+  "message": "Ride confirmed successfully",
+  "ride": {
+    "_id": "6908bd5ceb1d7313cd9883e9",
+    "user": {
+      "_id": "68fd3e1a831478f51f96df26",
+      "fullName": "John Doe",
+      "email": "john@example.com",
+      "socketId": "socket-id-123"
+    },
+    "captain": {
+      "_id": "67a5d2f8c9e4b2a1d8f7e9c1",
+      "fullName": "Mike Smith",
+      "vehicle": {
+        "vehicleType": "car",
+        "plate": "AB123CD"
+      }
+    },
+    "pickup": "bhosari",
+    "destination": "sant tukaram nagar",
+    "fare": 184.66,
+    "status": "accepted",
+    "otp": "1479"
+  }
+}
+```
+
+**Error Responses:**
+
+**Status Code:** `400 Bad Request`
+```json
+{
+  "message": "Ride ID is required"
+}
+```
+
+**Status Code:** `404 Not Found`
+```json
+{
+  "message": "Ride not found"
+}
+```
+
+---
+
+### 3. Start Ride (Protected - Captain)
+
+**Endpoint:** `GET /rides/start-ride`
+
+**Description:**  
+Captain starts the ride by verifying the OTP. This changes the ride status from `accepted` to `ongoing`. The user is notified via socket event about the ride start.
+
+**Query Parameters:**
+```
+rideId: string (required - valid MongoDB ObjectId)
+otp: string (required - 6-digit OTP)
+```
+
+**Example Request:**
+```
+GET http://localhost:4000/rides/start-ride?rideId=6908bd5ceb1d7313cd9883e9&otp=1479
+Authorization: Bearer <captain_jwt_token>
+```
+
+**Authentication:** Required (Captain JWT token)
+
+**Success Response:**
+
+**Status Code:** `200 OK`
+```json
+{
+  "message": "Ride started successfully",
+  "ride": {
+    "_id": "6908bd5ceb1d7313cd9883e9",
+    "user": {
+      "_id": "68fd3e1a831478f51f96df26",
+      "fullName": "John Doe",
+      "email": "john@example.com",
+      "socketId": "socket-id-123"
+    },
+    "captain": "67a5d2f8c9e4b2a1d8f7e9c1",
+    "pickup": "bhosari",
+    "destination": "sant tukaram nagar",
+    "fare": 184.66,
+    "status": "ongoing",
+    "otp": "1479"
+  }
+}
+```
+
+**Error Responses:**
+
+**Status Code:** `400 Bad Request` - Validation Error
+```json
+{
+  "errors": [
+    {
+      "msg": "invalid ride ID"
+    }
+  ]
+}
+```
+
+**Status Code:** `500 Internal Server Error` - Ride not found or invalid OTP
+```json
+{
+  "message": "Ride not found or invalid OTP."
+}
+```
+
+**Status Code:** `500 Internal Server Error` - Ride not in accepted status
+```json
+{
+  "message": "Ride cannot be started. Current status: pending"
+}
+```
+
+---
+
+## Ride Status Lifecycle
+
+| Status | Description |
+|--------|-------------|
+| `pending` | Ride request created, waiting for captain acceptance |
+| `accepted` | Captain has confirmed the ride, waiting to start |
+| `ongoing` | Ride has started, user and captain are in transit |
+| `completed` | Ride has finished |
+| `cancelled` | Ride was cancelled by user or captain |
+
+---
+
+## Ride Workflow
+
+```
+1. User creates ride (POST /rides/create)
+   └─ Status: pending
+   └─ Nearby captains notified via socket event "new-ride"
+
+2. Captain confirms ride (POST /rides/confirm)
+   └─ Status: accepted
+   └─ User notified via socket event "ride-confirmed"
+   └─ Captain assigned to ride
+
+3. Captain starts ride (GET /rides/start-ride?rideId=...&otp=...)
+   └─ Status: ongoing
+   └─ User notified via socket event "ride-started"
+```

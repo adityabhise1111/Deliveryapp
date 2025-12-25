@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import travis_kalanick from '../assets/travis_kalanick.jpeg'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 interface Ride {
     _id: string;
@@ -18,11 +19,61 @@ interface ConfirmRidePopUpProps {
     ride: Ride | null;
 }
 
+interface StartRideResponse {
+    message: string;
+    ride: {
+        _id: string;
+        user: {
+            fullName: string;
+            email: string;
+            socketId: string;
+        };
+        pickup: string;
+        destination: string;
+        fare: number;
+        status: string;
+    };
+}
+
 const ConfirmRidePopUp: React.FC<ConfirmRidePopUpProps> = (props) => {
-    const [otp, setotp] = useState<number>(NaN);
-    const submitHandler = (e: React.FormEvent<HTMLFormElement>): void => {
+    const [otp, setotp] = useState<string>('');
+    const navigate = useNavigate();
+    const submitHandler = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+    
         e.preventDefault();
-        // Add OTP verification logic here
+
+        try {
+            console.log('[ConfirmRidePopUp] Starting ride with:', { rideId: props.ride?._id, otp });
+            const response = await axios.get<StartRideResponse>(`${import.meta.env.VITE_BASE_URL}/rides/start-ride`, {
+                params: {
+                    rideId: props.ride?._id,
+                    otp: otp,
+                },
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+            console.log('[ConfirmRidePopUp] Ride started successfully:', response.data);
+            
+            if (response.status === 200) {
+                alert('Ride started successfully!');
+                props.setconfirmRidePopUpPanel(false);
+                props.setridePopUpPanel(false);
+                navigate('/captain-riding', { state: { ride: response.data.ride } });
+            }
+            else{
+                alert('[confirm ride popup]Failed to start ride. Please check the OTP and try again.');
+                console.error('[confirm ride popup]Failed to start ride:', response.data);
+                console.log('Response data:', response.data);
+
+            }
+            
+        } catch (error: unknown) {
+            console.error('Error starting ride:', error);
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            alert('Failed to start ride. Please check the OTP and try again. ' + errorMessage);
+            
+        }
     };
     return (
         <div>
@@ -78,7 +129,7 @@ const ConfirmRidePopUp: React.FC<ConfirmRidePopUpProps> = (props) => {
                     >
                         <input
                             onChange={(e) => {
-                                setotp(Number(e.target.value));
+                                setotp(e.target.value);
                             }}
                             value={otp}
                             className='bg-[#eee] px-6 py-4 text-lg mt-3 w-full font-mono rounded-lg'
@@ -88,12 +139,12 @@ const ConfirmRidePopUp: React.FC<ConfirmRidePopUpProps> = (props) => {
 
                         {/* Button Row */}
                         <div className="flex items-center justify-between gap-4 mt-5">
-                            <Link
-                                to='/captain-riding'
+                            <button
+                                type='submit'
                                 className='flex-1 bg-green-500 text-center text-white font-semibold p-3 rounded-lg'
                             >
                                 Confirm
-                            </Link>
+                            </button>
 
                             <button
                                 type="button"

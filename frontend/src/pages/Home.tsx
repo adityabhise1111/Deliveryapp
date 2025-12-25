@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useContext } from 'react'
 import image from '../assets/image.png'
+import LiveMap from '../components/LiveMap'
 import uber from '../assets/uber.png'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
@@ -12,14 +13,14 @@ import WaitingForDriver from '../components/WaitingForDriver'
 import axios from 'axios'
 import { SocketContext } from '../context/SocketContext'
 import { UserDataContext } from '../context/UserContext'
+import { useNavigate } from 'react-router-dom'
+import { type IRide as Ride } from '../components/WaitingForDriver';
 
 export interface Fares {
   auto: number;
   motorcycle: number;
   car: number;
 }
-
-import { type IRide as Ride } from '../components/WaitingForDriver';
 
 export interface RideEvent {
   event: string;
@@ -52,6 +53,7 @@ const Home: React.FC = () => {
 
   const { sendMessage } = useContext(SocketContext)
   const { user } = useContext(UserDataContext) || { user: null };
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (user && user.user && user.user._id) {
@@ -85,6 +87,13 @@ const Home: React.FC = () => {
     setWaitingForDriverPanel(true);
   };
   socket.on('ride-confirmed', handleRideConfirmed);
+
+  socket.on('ride-started', (rideData: Ride) => {
+    setWaitingForDriverPanel(false);
+    console.log('[Home]: Ride started received:', rideData);
+    // alert('Your ride has started!');
+    navigate('/riding', { state: { ride: rideData } });
+  });
 
   const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -266,8 +275,9 @@ const Home: React.FC = () => {
   return (
     <div className='h-screen relative overflow-hidden'>
       <img className='top-5 left-5 w-16 absolute' src={uber} alt="uber-logo" />
-      <div className="h-screen w-screen" >
-        <img className="h-full w-full object-cover " src={image} alt="map" />
+      <div className="absolute inset-0 z-0" id='map' >
+        {/* <img className="h-full w-full object-cover " src={image} alt="map" /> */}
+        <LiveMap/>
       </div>
       <div className="flex flex-col justify-end h-screen absolute top-0 w-full ">
         <div className={`bg-white h-[50%] p-5 ${panel ? ' ' : 'rounded-t-3xl'}`}>

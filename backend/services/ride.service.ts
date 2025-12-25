@@ -121,6 +121,7 @@ export async function startRideService({ rideId, otp, captain }: { rideId: strin
             status: 'ongoing',
         })
             .populate('user', 'fullName email socketId')
+            .populate('captain', 'fullName vehicle')
         if (!response) {
             throw new Error("[Ride Service]:Failed to start the ride.");
         }
@@ -131,3 +132,37 @@ export async function startRideService({ rideId, otp, captain }: { rideId: strin
         
     }
 }
+
+export async function endRideService({ rideId, captain }: { rideId: string | undefined; captain: ICaptain }): Promise<IRide> {
+    if (!rideId) {
+        throw new Error("[Ride Service]:Ride ID is required to end a ride.");
+    }
+    const ride = await RideModel.findOne({ _id: rideId }).populate('captain').populate('user');
+    if (!ride) {
+        throw new Error("[Ride Service]:Ride not found.");
+    }
+    if (ride.status !== 'ongoing') {
+        throw new Error("[Ride Service]:Ride cannot be ended. Current status: " + ride.status);
+    }
+    try {
+        const response = await RideModel.findOneAndUpdate({
+            _id: rideId,
+            captain: captain._id
+        }, {
+            status: 'completed',
+        })
+            .populate('user', 'fullName email socketId')
+            .populate('captain', 'fullName vehicle')
+        if (!response) {
+            console.log("[Ride Service]:Failed to end the ride for rideId:", rideId);
+            throw new Error("[Ride Service]:Failed to end the ride."+response);
+        }
+        console.log("[Ride Service]:Ride ended successfully ", response);
+        return response;
+
+    } catch (error: any) {
+        console.error("[Ride Service]:Error ending the ride for rideId:", rideId, "Error:", error);
+        console.log("[rideservice]"+error);
+        throw new Error("[Ride Service]:Error ending the ride: " + (error as Error).message);
+    }
+}  

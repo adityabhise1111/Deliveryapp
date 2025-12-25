@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, Links, useLocation } from 'react-router-dom'
 import uber from '../assets/uber.png'
 import image from '../assets/image.png'
 import { useGSAP } from "@gsap/react";
@@ -6,9 +6,14 @@ import gsap from 'gsap'
 import { useRef, useState } from 'react';
 import FinishRide from '../components/FinishRide';
 
+
 const CaptainRiding: React.FC = () => {
     const [finishRidePanel, setfinishRidePanel] = useState<boolean>(false)
     const finishRideRef = useRef(null);
+    const location = useLocation();
+    const rideData = location.state?.ride;
+    console.log('Ride Data in CaptainRiding:', rideData);
+
     useGSAP(function () {
         if (finishRidePanel) {
             gsap.to(finishRideRef.current, {
@@ -22,6 +27,7 @@ const CaptainRiding: React.FC = () => {
             })
         }
     }, [finishRidePanel]);
+
     return (
         <div className='h-screen relative'>
             <div className="fixed p-3 top 0 flex items-center justify-between w-screen ">
@@ -34,7 +40,7 @@ const CaptainRiding: React.FC = () => {
                 <img className='h-full w-full object-cover' src={image} alt="" />
             </div>
             <div className="h-1/5 flex items-center justify-between relative bg-yellow-400 pt-10 p-6"
-                 onClick={()=>{
+                onClick={() => {
                     setfinishRidePanel(true);
                 }}>
                 <h5 className='p-1 text-center w-[90%] absolute top-0'>
@@ -46,7 +52,10 @@ const CaptainRiding: React.FC = () => {
                 </button>
             </div>
             <div ref={finishRideRef} className="fixed bottom-0 w-full translate-y-full bg-white z-10 rounded-t-3xl ">
-                <FinishRide setfinishRidePanel={setfinishRidePanel} />
+                <FinishRide
+                    rideData={rideData}
+                    setfinishRidePanel={setfinishRidePanel} 
+                    />
             </div>
         </div>
     )

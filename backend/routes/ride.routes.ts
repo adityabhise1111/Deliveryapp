@@ -1,13 +1,20 @@
 import express from "express";
-import { Request, Response ,NextFunction} from "express";
-import { authUser,authCaptain } from "../middlewares/auth.middleware";
-import {body,query} from "express-validator";
-import { createRideController,confirmRideController ,getFares,getOtp, startRideController } from "../controllers/ride.controller";
+import { Request, Response, NextFunction } from "express";
+import { authUser, authCaptain } from "../middlewares/auth.middleware";
+import { body, query } from "express-validator";
+import {
+    createRideController,
+    confirmRideController,
+    getFares,
+    getOtp,
+    startRideController,
+    endRideController
+} from "../controllers/ride.controller";
 
 
 const router = express.Router();
 
-router.post('/create' ,
+router.post('/create',
     body('pickup').isString().withMessage('Pickup location is required'),
     body('destination').isString().withMessage('Destination is required'),
     body('vehicleType').isIn(['auto', 'car', 'motorcycle']).withMessage('Invalid vehicle type'),
@@ -25,13 +32,13 @@ router.post('/confirm',
 router.get('/get-fares',
     query('pickup').isString().withMessage('Pickup location is required'),
     query('destination').isString().withMessage('Destination is required'),
-    authUser ,
+    authUser,
     getFares
 )
 
 router.get('/get-otp',
     query('rideId').isMongoId().withMessage('invalid ride ID'),
-    authUser ,
+    authUser,
     getOtp
 )
 
@@ -40,6 +47,14 @@ router.get('/start-ride',
     query('rideId').isMongoId().withMessage('invalid ride ID'),
     query('otp').isString().withMessage('OTP is required'),
     startRideController
+
+)
+
+router.post('/end-ride',
+    authCaptain,
+    body('rideId').isMongoId().withMessage('invalid ride ID'),
+    endRideController
+
 
 )
 

@@ -1,5 +1,5 @@
 import { validationResult } from "express-validator";
-import { createRide, confirmRide, getFare, startRideService } from "../services/ride.service";
+import { createRide, confirmRide, getFare, startRideService, endRideService } from "../services/ride.service";
 import e, { Request, Response, NextFunction } from "express";
 import { getAddressCoordinates, getCaptainsIntheRadius } from "../services/maps.service";
 import { sendMessageToSocket } from "../services/socket";
@@ -95,7 +95,8 @@ export async function confirmRideController(req: Request, res: Response): Promis
         return;
     }
 
-    const { rideId, captainId } = req.body;
+    const rideId = req.body.rideId as string | undefined;
+    const captainId = req.body.captainId as string | undefined;
     console.log('[Ride Controller]: confirmRideController called with body:', req.body);
 
     // ✅ Add error checking
@@ -182,7 +183,12 @@ export async function startRideController(req: Request, res: Response, next: Nex
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
-    const { rideId,otp } = req.query;
+    if(!req.captain){
+        return  res.status(401).json({message:"Unauthorized : Captain not found in request"});
+    }
+    const rideId = req.query.rideId as string | undefined;
+    const otp = req.query.otp as string | undefined;
+    
     try {
         const ride = await startRideService({rideId,otp , captain:req.captain});
 
@@ -197,4 +203,38 @@ export async function startRideController(req: Request, res: Response, next: Nex
     }
         
 
+}
+
+export async function endRideController(req: Request, res: Response, next: NextFunction) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.error('Validation errors in endRideController:', errors.array());
+        console.log('Request body:', req.body);
+        return res.status(400).json({ errors: errors.array() });
+    }
+    try {
+        const { rideId } = req.body;
+        if (!rideId) {
+            console.error('[ride controller]: rideId is missing in request body');
+            console.log('[ride controller]Request body:', req.body);
+            return res.status(400).json({ message: 'rideId is required' });
+        }
+        const ride = await endRideService({ rideId, captain: req.captain  });
+        if (!ride) {
+            console.error('[ride controller]: Ride not found for rideId:', rideId);
+            return res.status(404).json({ message: 'Ride not found' });
+        }
+        sendMessageToSocket(ride.user?.socketId, {
+            event: "ride-ended",
+            data: ride
+        });
+        console.log('[ride controller]: Ride ended successfully:', ride);
+        return res.status(200).json({ message: 'Ride ended successfully', ride });
+        
+    } catch (error) {
+        console.error('[ride controller]: Error in endRideController:', error);
+        console.log('[ride controller]Request body at error time:', req.body);
+        return res.status(500).json({ message: '[ride controller] Internal server error'+ error });
+        
+    }
 }

@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect, useContext } from 'react'
 import { Link } from 'react-router-dom'
-import image from '../assets/image.png'
+
 import uber from '../assets/uber.png'
 import RidePopUp from '../components/RidePopUp'
 import CaptainPanel from '../components/CaptainPanel'
@@ -10,10 +10,16 @@ import ConfirmRidePopUp from '../components/ConfirmRidePopUp'
 import { CaptainDataContext } from '../context/CaptainContext'
 import { SocketContext } from '../context/SocketContext'
 import axios from 'axios'
+import LiveMap from '../components/LiveMap'
 
 interface Ride {
   _id: string;
-  user: string; // User ID as string
+  user: {
+    fullName: {
+      firstName: string;
+      lastName: string;
+    };
+  };
   pickup: string;
   destination: string;
   fare: number;
@@ -146,7 +152,7 @@ const CaptainHome: React.FC = () => {
         </Link>
       </div>
       <div className="h-3/5">
-        <img className='h-full w-full object-cover' src={image} alt="" />
+        <LiveMap />
       </div>
       <div className="h-2/5 p-4">
         <CaptainPanel />

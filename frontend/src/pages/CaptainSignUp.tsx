@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { CaptainDataContext } from '../context/CaptainContext';
 import { useNavigate } from 'react-router-dom';
-import axios ,{ type AxiosResponse }from 'axios';
+import axios, { type AxiosResponse } from 'axios';
 
 
 
@@ -34,33 +34,33 @@ const CaptainSignUp: React.FC = () => {
   if (!context) {
     throw new Error('UserSignUp must be used within UserContextProvider');
   }
-  const { captain, setCaptain } = context;
+  const { setCaptain } = context;
   console.log("[CaptainSignUp] Rendering CaptainSignUp component");
 
   const [firstname, setFirstname] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  
+
   const [vehicleColor, setVehicleColor] = useState<string>("");
   const [vehiclePlate, setVehiclePlate] = useState<string>("");
   const [vehicleCapacity, setVehicleCapacity] = useState<string>("");
   const [vehicleType, setVehicleType] = useState<VehicleType | "">("");
-  
-  const [captainData, setCaptainData] = useState<CaptainData | {}>({});
 
-  const submitHandler = async(e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+  const [, setCaptainData] = useState<CaptainData | {}>({});
+
+  const submitHandler = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     if (password.length < 6) {
       alert("Password must be at least 6 characters long");
       return;
     }
     const newCaptainData: CaptainData = {
-      fullName:{
+      fullName: {
         firstName: firstname,
         lastName
       },
-      email, 
+      email,
       password,
       vehicle: {
         color: vehicleColor,
@@ -72,7 +72,7 @@ const CaptainSignUp: React.FC = () => {
 
     console.log("New Captain Data:", newCaptainData);
 
-    const response : AxiosResponse = await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/register`, newCaptainData);
+    const response: AxiosResponse = await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/register`, newCaptainData);
 
     if (response.status === 201) {
       const data = response.data;
@@ -81,10 +81,10 @@ const CaptainSignUp: React.FC = () => {
 
       navigate('/home');
     }
-    
+
     setCaptainData(newCaptainData);
     console.log(newCaptainData);
-    
+
     setEmail("");
     setPassword("");
     setFirstname("");
@@ -150,7 +150,7 @@ const CaptainSignUp: React.FC = () => {
           />
 
           <h3 className='text-2xl mb-2 '>Vehicle Information</h3>
-          
+
           <div className='flex gap-4 mb-5'>
             <input
               className='bg-[#eeeeee] rounded px-4 py-2 border w-1/2 placeholder:text-base '

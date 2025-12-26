@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { CaptainDataContext } from '../context/CaptainContext';
-import axios, {type AxiosResponse} from 'axios';
+import axios, { type AxiosResponse } from 'axios';
 
 interface CaptainLoginData {
     email: string;
@@ -14,30 +14,26 @@ const CaptainLogin: React.FC = () => {
     if (!context) {
         throw new Error('CaptainLogin must be used within CaptainDataContext');
     }
-    const { captain, setCaptain } = context;
+    const { setCaptain } = context;
 
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
-    const [captainData, setCaptainData] = useState<CaptainLoginData | {}>({});
-    const [kapil, setkapil] = useState("")
 
-    const submitHandler = async(e: React.FormEvent<HTMLFormElement>): void => {
+    const submitHandler = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
-        setCaptainData({
-            email, password
-        })
+
         const loginData: CaptainLoginData = {
             email,
             password
         };
-        
+
         console.log('[CaptainLogin] Attempting login with:', { email, passwordLength: password.length });
-        
+
         try {
             const response: AxiosResponse = await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/login`, loginData);
-            
+
             console.log('[CaptainLogin] Login response:', response.status, response.data);
-            
+
             if (response.status === 200) {
                 const data = response.data;
                 setCaptain(data.captain);
@@ -45,7 +41,7 @@ const CaptainLogin: React.FC = () => {
                 console.log('[CaptainLogin] Login successful, navigating to /home');
                 navigate('/captain-home');
             }
-            
+
             setEmail("");
             setPassword("");
         } catch (error: any) {
@@ -53,10 +49,10 @@ const CaptainLogin: React.FC = () => {
             console.error('[CaptainLogin] Error response:', error.response);
             console.error('[CaptainLogin] Error response data:', error.response?.data);
             console.error('[CaptainLogin] Error status:', error.response?.status);
-            
+
             const errorMessage = error.response?.data?.message || error.message || 'Login failed. Please check your credentials.';
             console.error('[CaptainLogin] Final error message:', errorMessage);
-            
+
             alert(errorMessage);
         }
     }

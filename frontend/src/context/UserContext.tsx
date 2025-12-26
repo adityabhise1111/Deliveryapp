@@ -16,7 +16,7 @@ export interface User {
 export interface UserContextType {
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
-  
+
 }
 
 interface UserContextProviderProps {
@@ -26,14 +26,7 @@ interface UserContextProviderProps {
 export const UserDataContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserContextProvider: React.FC<UserContextProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>({
-    email:" ",
-    fullName:{
-      firstName: " ",
-      lastName: " "
-    },
-
-  });
+  const [user, setUser] = useState<User | null>(null);
 
   return (
     <UserDataContext.Provider value={{ user, setUser }}>

@@ -9,7 +9,7 @@ export async function initializeSocket(server: HttpServer) {
     //initialization code here
     io = new Server(server, {
         cors: {
-            origin: "*",
+            origin: process.env.FRONT_END_URL,
             methods: ["GET", "POST"]
         }
     })
@@ -20,9 +20,9 @@ export async function initializeSocket(server: HttpServer) {
     //its triggered when a client connects to the server
     io.on('connection', (socket: Socket) => {
         console.log(`New client connected: ${socket.id}`);
-        
+
         //some socket event listeners
-        
+
         socket.on("join", async (data) => {
             console.log("👤 Join request data:", data);
             const { userId, role } = data;
@@ -53,7 +53,7 @@ export async function initializeSocket(server: HttpServer) {
                         ltd: location.ltd,
                         lng: location.lng
                     }
-                },{new:true});
+                }, { new: true });
                 if (response) {
                     console.log(`Updated location for captain ${userId}:`, location);
                 } else {

@@ -22,14 +22,14 @@ const UserSignUp: React.FC = () => {
     throw new Error('UserSignUp must be used within UserContextProvider');
   }
 
-  const { user, setUser } = context;
+  const { setUser } = context;
 
 
   const [firstname, setFirstname] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [userData, setUserData] = useState<UserData | {}>({});
+  const [, setUserData] = useState<UserData | {}>({});
 
   const submitHandler = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
@@ -46,7 +46,7 @@ const UserSignUp: React.FC = () => {
       password,
     };
 
-    const response :AxiosResponse  = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/register`, newUserData);
+    const response: AxiosResponse = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/register`, newUserData);
     if (response.status === 201) {
       const data = response.data;
 

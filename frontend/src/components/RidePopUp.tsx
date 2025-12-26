@@ -1,9 +1,14 @@
-import React, { useState } from 'react'
+import React from 'react'
 import travis_kalanick from '../assets/travis_kalanick.jpeg'
 
 interface Ride {
     _id: string;
-    user: string;
+    user: {
+        fullName: {
+            firstName: string;
+            lastName: string;
+        };
+    };
     pickup: string;
     destination: string;
     fare: number;
@@ -15,11 +20,11 @@ interface RidePopUp {
     setridePopUpPanel: React.Dispatch<React.SetStateAction<boolean>>;
     setconfirmRidePopUpPanel: React.Dispatch<React.SetStateAction<boolean>>;
     ride: Ride | null;
-    confirmRide: () => void; 
+    confirmRide: () => void;
 }
 
 const RidePopUp: React.FC<RidePopUp> = (props) => {
-    
+
     return (
         <div>
             <h5 onClick={() => {

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 export interface IUser {
     _id: string;
     email: string;
@@ -33,15 +33,15 @@ const FinishRide: React.FC<FinishRide> = (props) => {
         // Logic to finish the ride can be added here
         try {
             const response = await axios.post(
-                `${import.meta.env.VITE_BASE_URL}/rides/end-ride`, {
-                    rideId: props.rideData?._id,
-                    captain: props.rideData?.captain
-                },{
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`
-                    }
+                `${import.meta.env.VITE_BASE_URL} /rides/end - ride`, {
+                rideId: props.rideData?._id,
+                captain: props.rideData?.captain
+            }, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')} `
                 }
-                
+            }
+
             );
             if (response.status !== 200) {
                 console.error('Failed to finish ride:', response.data);

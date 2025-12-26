@@ -1,8 +1,8 @@
-import React, { use, useContext, useEffect } from 'react'
-import image from '../assets/image.png'
+import React, { useContext, useEffect } from 'react'
 import car from '../assets/car.png'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { SocketContext } from '../context/SocketContext'
+import LiveMap from '../components/LiveMap'
 
 export interface ICaptain {
   _id: string;
@@ -40,7 +40,7 @@ export interface IRiding {
   user: IUser;
   __v: number;
 }
-const Riding: React.FC<IRiding> = (props) => {
+const Riding: React.FC = () => {
   const location = useLocation();
   const rideData = location.state?.ride as IRiding;
   const { socket } = useContext(SocketContext);
@@ -75,7 +75,8 @@ const Riding: React.FC<IRiding> = (props) => {
         <i className="text-lg font-bold ri-home-5-line"></i>
       </Link>
       <div className="h-1/2">
-        <img className='h-full w-full object-cover' src={image} alt="" />
+        {/* <img className='h-full w-full object-cover' src={image} alt="" /> */}
+        <LiveMap />
       </div>
       <div className="h-1/2 p-4">
         {/* panels will go here */}

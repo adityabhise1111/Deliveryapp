@@ -8,16 +8,17 @@ interface vehiclePanelProps {
     setVehiclePanel: React.Dispatch<React.SetStateAction<boolean>>;
     selectedVehicle?: string | null;
     setConfirmRidePanel: React.Dispatch<React.SetStateAction<boolean>>;
-    fares :{
+    fares: {
         motorcycle: number;
         auto: number;
         car: number;
     };
+    isLoading?: boolean;
 }
 
 const VehiclePanel: React.FC<vehiclePanelProps> = (props) => {
     const fares = props.fares;
-    console.log("VehiclePanel fares:",fares);
+    console.log("VehiclePanel fares:", fares);
     return (
         <div>
             <h5
@@ -41,7 +42,7 @@ const VehiclePanel: React.FC<vehiclePanelProps> = (props) => {
                     <h5 className="distance font-medium text-sm">2 mins away</h5>
                     <p className="para font-normal text-xs">Affordable Compact Rides</p>
                 </div>
-                <h2 className="price text-2xl font-semibold">₹{fares.motorcycle}</h2>
+                <h2 className="price text-2xl font-semibold">{props.isLoading ? <span className='text-sm text-gray-500'>Loading...</span> : `₹${fares.motorcycle}`}</h2>
             </div>
             <div
                 onClick={() => {
@@ -56,7 +57,7 @@ const VehiclePanel: React.FC<vehiclePanelProps> = (props) => {
                     <h5 className="distance font-medium text-sm">2 mins away</h5>
                     <p className="para font-normal text-xs">Affordable Compact Rides</p>
                 </div>
-                <h2 className="price text-2xl font-semibold">₹{fares.auto}</h2>
+                <h2 className="price text-2xl font-semibold">{props.isLoading ? <span className='text-sm text-gray-500'>Loading...</span> : `₹${fares.auto}`}</h2>
             </div>
             <div
                 onClick={() => {
@@ -71,7 +72,7 @@ const VehiclePanel: React.FC<vehiclePanelProps> = (props) => {
                     <h5 className="distance font-medium text-sm">2 mins away</h5>
                     <p className="para font-normal text-xs">Affordable Compact Rides</p>
                 </div>
-                <h2 className="price text-2xl font-semibold">₹{fares.car}</h2>
+                <h2 className="price text-2xl font-semibold">{props.isLoading ? <span className='text-sm text-gray-500'>Loading...</span> : `₹${fares.car}`}</h2>
             </div>
         </div>
     )

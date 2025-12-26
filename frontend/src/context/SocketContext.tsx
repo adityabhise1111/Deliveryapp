@@ -1,14 +1,14 @@
-import React, { createContext, useEffect,  } from 'react'
+import { createContext, useEffect, } from 'react'
 import type { ReactNode } from 'react'
 import { io, Socket } from 'socket.io-client';
 
 export const SocketContext = createContext<any>(null);
 
-const socket :Socket = io(`${import.meta.env.VITE_BASE_URL}`); // replace with your server URL
+const socket: Socket = io(`${import.meta.env.VITE_BASE_URL}`); // replace with your server URL
 interface SocketContextProviderProps {
-  children: ReactNode;
+    children: ReactNode;
 }
-export const SocketProvider = ({ children  }:SocketContextProviderProps) => {
+export const SocketProvider = ({ children }: SocketContextProviderProps) => {
     useEffect(() => {
         socket.on('connect', () => {
             console.log('Connected to socket server');
@@ -32,7 +32,7 @@ export const SocketProvider = ({ children  }:SocketContextProviderProps) => {
         socket.on(eventName, (message: string) => {
             callback(message);
         });
-        
+
     }
 
     return (

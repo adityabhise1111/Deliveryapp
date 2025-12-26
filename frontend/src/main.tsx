@@ -8,6 +8,7 @@ import CaptainContextProvider from './context/CaptainContext.tsx'
 import SocketProvider from './context/SocketContext.tsx'
 import 'leaflet/dist/leaflet.css';
 
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <CaptainContextProvider>

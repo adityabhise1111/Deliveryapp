@@ -1,4 +1,4 @@
-import express,  { Application, Request, Response } from 'express'
+import express, { Application, Request, Response } from 'express'
 import dotenv from 'dotenv'
 import { connectToDB } from './db/db.js';
 import cors from 'cors';
@@ -18,9 +18,12 @@ dotenv.config();
 
 connectToDB();
 
-const app  = express()
+const app = express()
 
-app.use(cors());
+app.use(cors({
+    origin: process.env.FRONT_END_URL,
+    credentials: true
+}));
 
 
 app.use(express.json());
@@ -33,10 +36,10 @@ app.use('/users', userRoutes);
 app.use('/captains', captainRoutes);
 
 
-app.use('/maps', mapRoutes);   
-app.use('/rides',ridesRoutes); 
+app.use('/maps', mapRoutes);
+app.use('/rides', ridesRoutes);
 
-app.get('/' , (req:Request,res:Response)=> {
+app.get('/', (req: Request, res: Response) => {
     res.send("hellow");
 })
 

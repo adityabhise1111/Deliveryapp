@@ -1,14 +1,13 @@
-import { Link, Links, useLocation } from 'react-router-dom'
-import uber from '../assets/uber.png'
-import image from '../assets/image.png'
+import { Link, useLocation } from 'react-router-dom'
 import { useGSAP } from "@gsap/react";
 import gsap from 'gsap'
 import { useRef, useState } from 'react';
 import FinishRide from '../components/FinishRide';
-
+import LiveMap from '../components/LiveMap';
 
 const CaptainRiding: React.FC = () => {
     const [finishRidePanel, setfinishRidePanel] = useState<boolean>(false)
+    const [, setConfirmRidePopUpPanel] = useState<boolean>(false)
     const finishRideRef = useRef(null);
     const location = useLocation();
     const rideData = location.state?.ride;
@@ -31,13 +30,13 @@ const CaptainRiding: React.FC = () => {
     return (
         <div className='h-screen relative'>
             <div className="fixed p-3 top 0 flex items-center justify-between w-screen ">
-                <img className='w-16' src={uber} alt="" />
+
                 <Link to='/captain-home' className="fixed h-10 w-10 bg-white flex items-center justify-center top-5 right-5 rounded-full shadow-lg">
                     <i className="text-lg font-bold ri-logout-box-r-line "></i>
                 </Link>
             </div>
             <div className="h-4/5">
-                <img className='h-full w-full object-cover' src={image} alt="" />
+                <LiveMap />
             </div>
             <div className="h-1/5 flex items-center justify-between relative bg-yellow-400 pt-10 p-6"
                 onClick={() => {
@@ -54,8 +53,9 @@ const CaptainRiding: React.FC = () => {
             <div ref={finishRideRef} className="fixed bottom-0 w-full translate-y-full bg-white z-10 rounded-t-3xl ">
                 <FinishRide
                     rideData={rideData}
-                    setfinishRidePanel={setfinishRidePanel} 
-                    />
+                    setfinishRidePanel={setfinishRidePanel}
+                    setconfirmRidePopUpPanel={setConfirmRidePopUpPanel}
+                />
             </div>
         </div>
     )

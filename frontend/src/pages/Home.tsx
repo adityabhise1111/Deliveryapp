@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect, useContext } from 'react'
-import image from '../assets/image.png'
 import LiveMap from '../components/LiveMap'
-import uber from '../assets/uber.png'
+
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import 'remixicon/fonts/remixicon.css'
@@ -41,6 +40,7 @@ const Home: React.FC = () => {
   const [destinationSuggestions, setDestinationSuggestions] = useState<Array<string>>([])
   const [activeInput, setActiveInput] = useState<'pickup' | 'destination' | null>(null);
   const [fares, setFares] = useState<Fares>({ auto: 0, motorcycle: 0, car: 0 });
+  const [isVehicleLoading, setIsVehicleLoading] = useState<boolean>(false);
   const [ride, setRide] = useState<Ride | null>(null); // ✅ ADD THIS
 
   const panelRef = useRef<HTMLDivElement>(null);
@@ -225,6 +225,7 @@ const Home: React.FC = () => {
   const findTrip = async () => {
     setVehiclePanel(true);
     setPanel(false);
+    setIsVehicleLoading(true);
 
     try {
       const response = await axios.get<FaresResponse>(
@@ -247,6 +248,8 @@ const Home: React.FC = () => {
       console.error('Error fetching fares:', error);
       alert(error.response?.data?.message || 'Failed to fetch fares');
       setVehiclePanel(false);
+    } finally {
+      setIsVehicleLoading(false);
     }
   }
 
@@ -274,13 +277,13 @@ const Home: React.FC = () => {
 
   return (
     <div className='h-screen relative overflow-hidden'>
-      <img className='top-5 left-5 w-16 absolute' src={uber} alt="uber-logo" />
+      {/* <img className='top-5 left-5 w-16 absolute z-10' src={uber} alt="uber-logo" /> */}
       <div className="absolute inset-0 z-0" id='map' >
         {/* <img className="h-full w-full object-cover " src={image} alt="map" /> */}
-        <LiveMap/>
+        <LiveMap />
       </div>
       <div className="flex flex-col justify-end h-screen absolute top-0 w-full ">
-        <div className={`bg-white h-[50%] p-5 ${panel ? ' ' : 'rounded-t-3xl'}`}>
+        <div className={`bg-white h-[50%] p-5 ${panel ? ' ' : 'rounded-t-3xl'} relative z-30`}>
           <h4 className='text-3xl semi-bold'>Find a trip</h4>
           <h5 onClick={() => { setPanel(false) }} ref={panelCloseRef}
             className='top-6 right-5 absolute font-bold '><i className="ri-arrow-down-wide-line"></i></h5>
@@ -313,7 +316,7 @@ const Home: React.FC = () => {
           </form>
         </div>
 
-        <div ref={panelRef} className='h-[0%]  bg-white '>
+        <div ref={panelRef} className='h-[0%]  bg-white z-30 '>
           <LocationSearchPanel
             setPanel={setPanel}
             setVehiclePanel={setVehiclePanel}
@@ -331,15 +334,15 @@ const Home: React.FC = () => {
 
 
       </div>
-      <div ref={vehiclePanelRef} className="Vehicle bg-white fixed w-full z-10 bottom-0 translate-y-full px-3 py-8 rounded-2xl">
-        <VehiclePanel setConfirmRidePanel={setConfirmRidePanel} setVehiclePanel={setVehiclePanel} setSelectedVehicle={setSelectedVehicle} selectedVehicle={selectedVehicle} fares={fares} />
+      <div ref={vehiclePanelRef} className="Vehicle bg-white fixed w-full z-30 bottom-0 translate-y-full px-3 py-8 rounded-2xl">
+        <VehiclePanel isLoading={isVehicleLoading} setConfirmRidePanel={setConfirmRidePanel} setVehiclePanel={setVehiclePanel} setSelectedVehicle={setSelectedVehicle} selectedVehicle={selectedVehicle} fares={fares} />
       </div>
 
-      <div className="ConfirmRide bg-white fixed w-full z-10 bottom-0 translate-y-full px-3 py-8 rounded-2xl" ref={confirmRidePanelRef}>
+      <div className="ConfirmRide bg-white fixed w-full z-30 bottom-0 translate-y-full px-3 py-8 rounded-2xl" ref={confirmRidePanelRef}>
         <ConfirmRide createRide={createRide} pickup={pickup} destination={destination} fares={fares} selectedVehicle={selectedVehicle} confirmRidePanel={confirmRidePanel} setConfirmRidePanel={setConfirmRidePanel} setLookingForRidePanel={setLookingForRidePanel} />
       </div>
 
-      <div ref={vehicleFoundRef} className="lookingForRide bg-white fixed w-full z-10 bottom-0 translate-y-full px-3 py-8 rounded-2xl">
+      <div ref={vehicleFoundRef} className="lookingForRide bg-white fixed w-full z-30 bottom-0 translate-y-full px-3 py-8 rounded-2xl">
         <LookingForDriver
           lookingForRidePanel={lookingForRidePanel}
           setLookingForRidePanel={setLookingForRidePanel}
@@ -351,7 +354,7 @@ const Home: React.FC = () => {
         />
       </div>
 
-      <div ref={waitingForDriverRef} className="lookingForRide bg-white fixed w-full z-10 bottom-0 translate-y-full px-3 py-8 rounded-2xl">
+      <div ref={waitingForDriverRef} className="lookingForRide bg-white fixed w-full z-30 bottom-0 translate-y-full px-3 py-8 rounded-2xl">
         <WaitingForDriver
           setWaitingForDriverPanel={setWaitingForDriverPanel}
           ride={ride}  // ✅ Now ride is defined

@@ -169,3 +169,102 @@ which can be accessed by clicking the tune icon next to the URL.
 - For Captain APIs: Login as **Captain**
 - For User APIs: Login as **User**
 - Don't mix up: User account cannot access Captain-only endpoints
+
+---
+
+### 7. React-Leaflet Map Not Recentering on Live Location Updates
+
+**Error Message:**
+```
+Type '{ children: Element[]; center: number[]; zoom: number; className: string; }' 
+is not assignable to type 'IntrinsicAttributes & MapContainerProps & RefAttributes<LeafletMap>'.
+Property 'center' does not exist on type 'IntrinsicAttributes & MapContainerProps & RefAttributes<LeafletMap>'.
+```
+
+**Symptoms:**
+- Map doesn't move/recenter when user position changes
+- Only the marker updates its position
+- Browser console shows: `GeolocationPositionError: Timeout expired (code: 3)`
+- TypeScript errors on `MapContainer` component
+
+**Root Causes:**
+
+#### Cause 1: Leaflet Map Doesn't Auto-Update on State Change
+- **Problem:** `MapContainer`'s `center` prop only works on **initial render**
+- Leaflet uses **imperative API** while React is **declarative**
+- Updating React state doesn't trigger map re-centering
+
+```tsx
+// ❌ This doesn't work - map won't move when userPosition updates
+<MapContainer center={userPosition} zoom={13}>
+  <Marker position={userPosition} />
+</MapContainer>
+```
+
+#### Cause 2: TypeScript Type Mismatch
+- **Problem:** Leaflet expects `LatLngExpression` type: `[number, number]` or `{ lat, lng }`
+- Custom objects like `{ latitude, longitude }` don't match Leaflet's structure
+
+#### Cause 3: Geolocation Timeout on Desktop
+- **Problem:** Desktop devices lack GPS, rely on slower WiFi/IP-based location
+- `enableHighAccuracy: true` with short timeout causes frequent errors
+
+**Solution:**
+
+**Step 1:** Create a custom component using `useMap()` to imperatively control map view
+
+```tsx
+import { useMap } from "react-leaflet";
+import { useEffect } from "react";
+import type { LatLngExpression } from "leaflet";
+
+interface INewMapProps {
+  pos: LatLngExpression;
+}
+
+const NewMap = ({ pos }: INewMapProps) => {
+  const map = useMap();
+
+  useEffect(() => {
+    map.setView(pos); // Imperatively move the map
+  }, [pos, map]);
+
+  return null;
+};
+```
+
+**Step 2:** Use correct tuple format for positions
+
+```tsx
+// ✓ Correct - tuple format
+const [userPosition, setUserPosition] = useState<LatLngExpression>([18.5204, 73.8567]);
+
+// In watchPosition callback
+setUserPosition([latitude, longitude]); // ✓ Tuple format
+```
+
+**Step 3:** Add the custom component to MapContainer
+
+```tsx
+<MapContainer center={userPosition} zoom={13} className="h-[50%] w-full">
+  <TileLayer url="..." />
+  <Marker position={userPosition} />
+  <NewMap pos={userPosition} /> {/* ✓ Handles map view updates */}
+</MapContainer>
+```
+
+**Optional:** Adjust geolocation options for better desktop compatibility
+
+```tsx
+{
+  enableHighAccuracy: false, // Use network-based location
+  timeout: 60000,            // Longer timeout
+  maximumAge: 10000
+}
+```
+
+**Key Learnings:**
+- Leaflet uses imperative APIs; bridge the gap with custom React components
+- `MapContainer` props like `center` only work on mount
+- Always match Leaflet's expected types (`LatLngExpression`)
+- Desktop geolocation behaves differently than mobile GPS

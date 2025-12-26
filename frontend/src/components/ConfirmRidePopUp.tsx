@@ -1,11 +1,16 @@
 import React, { useState } from 'react'
 import travis_kalanick from '../assets/travis_kalanick.jpeg'
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 interface Ride {
     _id: string;
-    user: string;
+    user: {
+        fullName: {
+            firstName: string;
+            lastName: string;
+        };
+    };
     pickup: string;
     destination: string;
     fare: number;
@@ -39,7 +44,7 @@ const ConfirmRidePopUp: React.FC<ConfirmRidePopUpProps> = (props) => {
     const [otp, setotp] = useState<string>('');
     const navigate = useNavigate();
     const submitHandler = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
-    
+
         e.preventDefault();
 
         try {
@@ -54,25 +59,25 @@ const ConfirmRidePopUp: React.FC<ConfirmRidePopUpProps> = (props) => {
                 },
             });
             console.log('[ConfirmRidePopUp] Ride started successfully:', response.data);
-            
+
             if (response.status === 200) {
                 alert('Ride started successfully!');
                 props.setconfirmRidePopUpPanel(false);
                 props.setridePopUpPanel(false);
                 navigate('/captain-riding', { state: { ride: response.data.ride } });
             }
-            else{
+            else {
                 alert('[confirm ride popup]Failed to start ride. Please check the OTP and try again.');
                 console.error('[confirm ride popup]Failed to start ride:', response.data);
                 console.log('Response data:', response.data);
 
             }
-            
+
         } catch (error: unknown) {
             console.error('Error starting ride:', error);
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';
             alert('Failed to start ride. Please check the OTP and try again. ' + errorMessage);
-            
+
         }
     };
     return (

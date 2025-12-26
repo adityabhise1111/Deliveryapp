@@ -1,4 +1,3 @@
-import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
 import UserLogin from './pages/UserLogin'
@@ -17,31 +16,31 @@ const App = () => {
   return (
     <>
       <Routes>
-        <Route path='/' element={<Start/>}/>
-        <Route path='/home' element={ 
+        <Route path='/' element={<Start />} />
+        <Route path='/home' element={
           <UserProtectWrapper>
-            <Home/>
+            <Home />
           </UserProtectWrapper>
-         }/>
-         <Route path='/captain-home' element={
+        } />
+        <Route path='/captain-home' element={
           <CaptainProtectWrapper>
-            <CaptainHome/>
+            <CaptainHome />
           </CaptainProtectWrapper>
-         }/>
+        } />
 
 
 
 
-        <Route path='/login' element={<UserLogin/>}/>
-        <Route path='/signup' element={<UserSignUp/>}/>
-        <Route path='/logout' element={<UserLogout/>}/>
-        <Route path='/riding' element={<Riding/>}/>
-        <Route path='/captain-riding' element={<CaptainRiding/>}/>
-        <Route path='/captain-login' element={<CaptainLogin/>}/>
-        <Route path='/captain-signup' element={<CaptainSignUp/>}/>
-        <Route path='/captain-logout' element={<CaptainLogout/>}/>
+        <Route path='/login' element={<UserLogin />} />
+        <Route path='/signup' element={<UserSignUp />} />
+        <Route path='/logout' element={<UserLogout />} />
+        <Route path='/riding' element={<Riding />} />
+        <Route path='/captain-riding' element={<CaptainRiding />} />
+        <Route path='/captain-login' element={<CaptainLogin />} />
+        <Route path='/captain-signup' element={<CaptainSignUp />} />
+        <Route path='/captain-logout' element={<CaptainLogout />} />
 
-        <Route path='*' element={<div>404 Not Found</div>}/>
+        <Route path='*' element={<div>404 Not Found</div>} />
       </Routes>
     </>
   )

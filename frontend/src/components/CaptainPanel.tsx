@@ -18,7 +18,7 @@ const CaptainPanel = () => {
           </h4>
         </div>
         <div>
-          <h4 className='text-xl font-semibold'>₹498.76</h4>
+          <h4 className='text-xl font-semibold'>₹499.76</h4>
           <p className='text-lg font-medium text-gray-600'>Earned</p>
         </div>
       </div>
